@@ -62,7 +62,7 @@ export default function DropCircle() {
           over ? 'scale-[1.02]' : ''
         }`}
       >
-        <Ring empty={empty} fill={fill} over={over} />
+        <Ring empty={empty} fill={fill} over={over} running={running} />
 
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1 px-10 text-center">
           {empty ? <EmptyCentre over={over} /> : <LoadedCentre items={items} running={running} />}
@@ -90,8 +90,8 @@ const R = 88
 const CIRCUMFERENCE = 2 * Math.PI * R
 
 /**
- * The empty ring is drawn as 25 individual pills rather than one dashed circle,
- * so each can be lit on its own.
+ * The ring is drawn as 25 individual pills rather than one dashed circle, so
+ * each can be lit on its own.
  *
  * The trick is one `<circle>` per pill, each with a dash pattern of "one 10-unit
  * dash then a gap longer than the whole circumference" — so exactly one dash is
@@ -107,10 +107,53 @@ const CIRCUMFERENCE = 2 * Math.PI * R
 const PILLS = 25
 const PILL_PITCH = CIRCUMFERENCE / PILLS
 const PILL_DASH = 10
-/** Seconds for the lit group to travel once round. Slow enough to read as a drift. */
-const CHASE_SECONDS = 2.6
+/** Idle twinkle: roughly how long a pill waits between glows, before jitter. */
+const GLOW_SECONDS = 2.6
+/** Running chase: how long the lit group takes to travel once round. */
+const CHASE_SECONDS = 1.6
 
-function Ring({ empty, fill, over }: { empty: boolean; fill: number; over: boolean }) {
+/**
+ * A stable pseudo-random number in 0–1 for pill `i`.
+ *
+ * Deliberately NOT `Math.random()`. The scatter has to be identical on every
+ * render, or React re-rendering the circle — which it does on every drag-over,
+ * every file added, every progress tick — would reshuffle which pills are lit
+ * and make the ring flinch. It is also what makes the animation testable at
+ * all: a screenshot of a random ring can only ever be eyeballed.
+ *
+ * The classic sine-fract hash. Cheap, no dependency, and its output is spread
+ * evenly enough for two dozen values.
+ */
+function pillNoise(i: number): number {
+  const x = Math.sin(i * 127.1 + 311.7) * 43758.5453
+  return x - Math.floor(x)
+}
+
+function Ring({
+  empty,
+  fill,
+  over,
+  running,
+}: {
+  empty: boolean
+  fill: number
+  over: boolean
+  running: boolean
+}) {
+  // Two different animations, because they say two different things.
+  //
+  //  • **Idle, empty** — pills glow in a SCATTERED order: a slow twinkle, no
+  //    direction, nothing to follow. It says the target is alive and waiting.
+  //  • **Running** — pills glow in INDEX order, so a lit group travels round
+  //    the ring. That reads as "working", which is only honest while something
+  //    actually is. It was the first thing tried on the empty state and it was
+  //    wrong there: a page that greets you with a spinner looks like a page
+  //    that hasn't finished loading.
+  //
+  // With files queued but nothing running, the track is plain and still —
+  // neither sentence applies, so the ring says nothing.
+  const pills = empty || running
+
   return (
     <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90" aria-hidden="true">
       <defs>
@@ -124,12 +167,12 @@ function Ring({ empty, fill, over }: { empty: boolean; fill: number; over: boole
           confirms itself before the mouse button comes up. */}
       <circle cx="100" cy="100" r={R - 6} className={over ? 'fill-orange-50' : 'fill-white'} />
 
-      {/* Track. While empty it is 25 separate pills that drift round and light in
-          a travelling group — the "put something here" signal, moving. The
-          moment there is a file it becomes one solid track for the progress
-          fill to run against, because a ring that is both chasing and filling
-          is two animations arguing about what it is telling you. */}
-      {empty ? (
+      {/* Track. 25 separate pills whenever there is something to say (see above),
+          one plain circle when there isn't. During a run the solid progress fill
+          is drawn OVER these, so the chase is only visible in the part of the
+          ring still to be done — which is precisely the part still being worked
+          on. */}
+      {pills ? (
         <g className="uc-ring-spin">
           {Array.from({ length: PILLS }, (_, i) => (
             <circle
@@ -142,10 +185,24 @@ function Ring({ empty, fill, over }: { empty: boolean; fill: number; over: boole
               strokeLinecap="round"
               strokeDasharray={`${PILL_DASH} ${CIRCUMFERENCE}`}
               strokeDashoffset={-i * PILL_PITCH}
-              className={over ? 'stroke-orange-400' : 'uc-pill'}
-              // Each pill starts its glow a little later than the one before, so
-              // the lit group travels rather than the whole ring pulsing.
-              style={over ? undefined : { animationDelay: `${(i / PILLS) * CHASE_SECONDS}s` }}
+              className={over ? 'stroke-orange-400' : running ? 'uc-pill-chase' : 'uc-pill'}
+              style={
+                over
+                  ? undefined
+                  : running
+                    ? // Ordered delay → the lit group travels. Reads as working.
+                      { animationDelay: `${(i / PILLS) * CHASE_SECONDS}s` }
+                    : // Scattered delay AND scattered duration → no direction to
+                      // follow, and the pattern never quite repeats, so it reads
+                      // as a twinkle rather than as anything in progress.
+                      {
+                        animationDelay: `${pillNoise(i) * GLOW_SECONDS}s`,
+                        // A narrow spread. Wider and pills with similar periods
+                        // drift into phase and the ring pulses in clumps;
+                        // identical and the whole pattern loops visibly.
+                        animationDuration: `${2.4 + pillNoise(i + 97) * 1.0}s`,
+                      }
+              }
             />
           ))}
         </g>

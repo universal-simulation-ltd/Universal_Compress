@@ -24,23 +24,38 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* The empty drop circle: 25 pills, drifting and lighting in a travelling group.
-   See DropCircle.tsx for why they are 25 separate <circle>s and not one dashed
-   one. Each pill runs the same keyframe with its own delay, so the lit group
-   moves round the ring instead of the whole thing pulsing at once. */
+/* The drop circle's 25 pills. See DropCircle.tsx for why they are 25 separate
+   <circle>s and not one dashed one, and for why there are two behaviours.
+
+   Both classes run the SAME keyframe — the difference is entirely in how the
+   per-pill delays are assigned in the component. Ordered delays make the lit
+   group travel; scattered delays make it twinkle. */
 @keyframes uc-pill-glow {
   0%   { stroke: #cbd5e1; }   /* slate-300, the resting colour */
   6%   { stroke: #FE8C01; }
-  18%  { stroke: #FE8C01; }
-  32%  { stroke: #cbd5e1; }
+  16%  { stroke: #FE8C01; }
+  28%  { stroke: #cbd5e1; }
   100% { stroke: #cbd5e1; }
 }
 
-/* Lit for ~26% of the cycle × 25 pills ≈ six alight at any moment — enough to
-   read as a group travelling, few enough that the ring still reads as dashed. */
+/* Idle, empty: a scattered twinkle. Lit for ~22% of the cycle across 25 pills
+   is about five alight at any moment — enough that the ring is clearly alive,
+   sparse enough that there is no shape to follow. The duration is overridden
+   per pill so the pattern never settles into a loop.
+
+   ⚠️ It must NOT read as a spinner. A travelling group was tried here first and
+   looked exactly like a page still loading. */
 .uc-pill {
   stroke: #cbd5e1;
-  animation: uc-pill-glow 2.6s linear infinite;
+  animation: uc-pill-glow 2.8s linear infinite;
+}
+
+/* Running: the same glow, but the component hands out delays in index order, so
+   the lit pills form a group that travels. Faster than the idle twinkle,
+   because here looking busy is the point. */
+.uc-pill-chase {
+  stroke: #cbd5e1;
+  animation: uc-pill-glow 1.6s linear infinite;
 }
 
 /* A slow counter-drift under the chase, so the ring is never quite static. 48s
@@ -65,7 +80,7 @@ body {
      a gentle drift into a strobe. That is worse than the motion it was meant to
      spare someone. Both of these are switched off outright instead, leaving a
      plain slate dashed ring. */
-  .uc-pill, .uc-ring-spin {
+  .uc-pill, .uc-pill-chase, .uc-ring-spin {
     animation: none !important;
   }
 }
