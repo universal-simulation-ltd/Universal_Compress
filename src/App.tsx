@@ -3,7 +3,6 @@ import AppMenu from './components/Header/AppMenu'
 import ProductLogo from './components/Header/ProductLogo'
 import CompressApp from './components/compress/CompressApp'
 import UsageTracker from './UsageTracker'
-import { PRODUCTS } from './lib/catalogue'
 import { CONTAINER } from './lib/layout'
 
 const REPO_URL = 'https://github.com/universal-simulation-ltd/Universal_Compress'
@@ -17,7 +16,11 @@ export default function App() {
         productHomeHref={import.meta.env.BASE_URL}
         actions={<AppMenu />}
         actionsLabel="Compress"
-        products={PRODUCTS}
+        // No `products` prop: the SDK's own catalogue carries `compress` from
+        // 0.87.0, so the navbar reads the product name from there. A local
+        // catalogue lived here until then — two catalogues that disagree is how
+        // a product ends up with one name in the bar and another in the
+        // switcher, so there is deliberately only one now.
         suiteSwitcherIconSrc={`${import.meta.env.BASE_URL}unisim-icon.png`}
         contentClassName={CONTAINER}
       />
