@@ -89,6 +89,27 @@ export default function DropCircle() {
 const R = 88
 const CIRCUMFERENCE = 2 * Math.PI * R
 
+/**
+ * The empty ring is drawn as 25 individual pills rather than one dashed circle,
+ * so each can be lit on its own.
+ *
+ * The trick is one `<circle>` per pill, each with a dash pattern of "one 10-unit
+ * dash then a gap longer than the whole circumference" — so exactly one dash is
+ * ever visible — positioned by its own `strokeDashoffset`. That keeps the
+ * geometry identical to the `strokeDasharray="10 12"` it replaces (same arc
+ * length, same spacing, same round caps) while making every pill a separate
+ * element with its own colour and its own animation delay.
+ *
+ * 25 × 22.1 ≈ the full circumference, which is what closes the ring cleanly. A
+ * count that doesn't divide evenly leaves a visible seam where the last gap is
+ * the wrong width.
+ */
+const PILLS = 25
+const PILL_PITCH = CIRCUMFERENCE / PILLS
+const PILL_DASH = 10
+/** Seconds for the lit group to travel once round. Slow enough to read as a drift. */
+const CHASE_SECONDS = 2.6
+
 function Ring({ empty, fill, over }: { empty: boolean; fill: number; over: boolean }) {
   return (
     <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90" aria-hidden="true">
@@ -103,18 +124,42 @@ function Ring({ empty, fill, over }: { empty: boolean; fill: number; over: boole
           confirms itself before the mouse button comes up. */}
       <circle cx="100" cy="100" r={R - 6} className={over ? 'fill-orange-50' : 'fill-white'} />
 
-      {/* Track. Dashed while empty — the universal "put something here" — and
-          solid the moment there is something to show progress against. */}
-      <circle
-        cx="100"
-        cy="100"
-        r={R}
-        fill="none"
-        strokeWidth="10"
-        strokeDasharray={empty ? '10 12' : undefined}
-        strokeLinecap="round"
-        className={over ? 'stroke-orange-400' : empty ? 'stroke-slate-300' : 'stroke-slate-200'}
-      />
+      {/* Track. While empty it is 25 separate pills that drift round and light in
+          a travelling group — the "put something here" signal, moving. The
+          moment there is a file it becomes one solid track for the progress
+          fill to run against, because a ring that is both chasing and filling
+          is two animations arguing about what it is telling you. */}
+      {empty ? (
+        <g className="uc-ring-spin">
+          {Array.from({ length: PILLS }, (_, i) => (
+            <circle
+              key={i}
+              cx="100"
+              cy="100"
+              r={R}
+              fill="none"
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeDasharray={`${PILL_DASH} ${CIRCUMFERENCE}`}
+              strokeDashoffset={-i * PILL_PITCH}
+              className={over ? 'stroke-orange-400' : 'uc-pill'}
+              // Each pill starts its glow a little later than the one before, so
+              // the lit group travels rather than the whole ring pulsing.
+              style={over ? undefined : { animationDelay: `${(i / PILLS) * CHASE_SECONDS}s` }}
+            />
+          ))}
+        </g>
+      ) : (
+        <circle
+          cx="100"
+          cy="100"
+          r={R}
+          fill="none"
+          strokeWidth="10"
+          strokeLinecap="round"
+          className={over ? 'stroke-orange-400' : 'stroke-slate-200'}
+        />
+      )}
 
       {/* Fill. `pathLength` is not used: an exact dash offset against the real
           circumference keeps the cap sitting where the number says it is. */}

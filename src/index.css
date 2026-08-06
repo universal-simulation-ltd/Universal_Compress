@@ -24,9 +24,48 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* The empty drop circle: 25 pills, drifting and lighting in a travelling group.
+   See DropCircle.tsx for why they are 25 separate <circle>s and not one dashed
+   one. Each pill runs the same keyframe with its own delay, so the lit group
+   moves round the ring instead of the whole thing pulsing at once. */
+@keyframes uc-pill-glow {
+  0%   { stroke: #cbd5e1; }   /* slate-300, the resting colour */
+  6%   { stroke: #FE8C01; }
+  18%  { stroke: #FE8C01; }
+  32%  { stroke: #cbd5e1; }
+  100% { stroke: #cbd5e1; }
+}
+
+/* Lit for ~26% of the cycle × 25 pills ≈ six alight at any moment — enough to
+   read as a group travelling, few enough that the ring still reads as dashed. */
+.uc-pill {
+  stroke: #cbd5e1;
+  animation: uc-pill-glow 2.6s linear infinite;
+}
+
+/* A slow counter-drift under the chase, so the ring is never quite static. 48s
+   is deliberately far slower than the chase: it should be noticed on the second
+   look, not the first. */
+@keyframes uc-ring-spin {
+  to { transform: rotate(360deg); }
+}
+.uc-ring-spin {
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+  animation: uc-ring-spin 48s linear infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+  /* The blanket rule above is wrong for an INFINITE animation — a 0.01ms
+     duration on `infinite` restarts it hundreds of times a second, which turns
+     a gentle drift into a strobe. That is worse than the motion it was meant to
+     spare someone. Both of these are switched off outright instead, leaving a
+     plain slate dashed ring. */
+  .uc-pill, .uc-ring-spin {
+    animation: none !important;
   }
 }
