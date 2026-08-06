@@ -1,0 +1,33 @@
+# Cloudflare Pages rewrites — Universal Compress is served under /compress/ but
+# the built files in dist/ are flat (Vite's `base` only rewrites URLs INSIDE the
+# HTML; it does not place files in dist/compress/).
+#
+# 200 status = transparent rewrite (URL bar unchanged). Specific rules first,
+# broad SPA fallback last.
+
+# Service-worker + PWA artefacts.
+/compress/sw.js                /sw.js                200
+/compress/registerSW.js        /registerSW.js        200
+/compress/manifest.webmanifest /manifest.webmanifest 200
+/compress/workbox-*            /workbox-:splat       200
+
+# Hashed asset bundles — includes pdf.js's worker chunk and the LAME encoder,
+# both of which are fetched lazily on the first PDF / first audio job. Without
+# this rule the SPA fallback below answers with the app shell, the dynamic
+# import fails, and the failure only shows up for the people who dropped that
+# kind of file.
+/compress/assets/*             /assets/:splat        200
+
+# Static files referenced from index.html / app code (BASE_URL-prefixed).
+/compress/favicon.svg          /favicon.svg          200
+/compress/unisim-icon.png      /unisim-icon.png      200
+/compress/icon-180.png         /icon-180.png         200
+/compress/icon-192.png         /icon-192.png         200
+/compress/icon-512.png         /icon-512.png         200
+
+# SEO crawler files.
+/compress/robots.txt           /robots.txt           200
+/compress/sitemap.xml          /sitemap.xml          200
+
+# SPA fallback — everything else under /compress/ serves the shell.
+/compress/*                    /index.html           200

@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* min-height (not a fixed height) so the page grows with its content and the
+   document — including the footer — scrolls naturally on small screens. */
+#root {
+  min-height: 100%;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* Sizes and percentages sit in running text and change several times a second
+   while the queue runs. Tabular figures stop the line reflowing under them,
+   which otherwise reads as flicker. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

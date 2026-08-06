@@ -1,0 +1,9 @@
+# Force HTTPS: instruct browsers to only ever connect over TLS (mirrors the
+# marketing site). The HTTP→HTTPS redirect itself is the Cloudflare zone
+# "Always Use HTTPS" setting.
+#
+# ⚠️ Do NOT add Cross-Origin-Embedder-Policy here. See the note in
+# vite.config.ts — it breaks the navbar's org branding logos, and nothing in
+# this app wants SharedArrayBuffer.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
