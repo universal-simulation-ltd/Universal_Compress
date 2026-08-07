@@ -1,32 +1,20 @@
-import { encodeAac } from '@unisim/media'
-import { channelToInt16 } from '../pcm'
+import { encodeAac, encodeMp3, nearestLameRate } from '@unisim/media'
 import { compressedName } from '../layout'
 import type { AudioSettings, CompressedFile } from '../types'
 
 // Audio: decode with the browser, re-render at the target channel count, then
 // re-encode at the chosen bitrate.
 //
-// MP3 goes through LAME compiled to JavaScript (@breezystack/lamejs). Why not
-// ffmpeg.wasm: the only published @ffmpeg/core build is GPL-2.0-or-later (it
-// bundles libx264), which would relicense this app. LAME's JS port is LGPL-3.0 —
-// a dependency licence, not a project one — so the app stays MIT, and the
-// download is ~100× smaller than the 31 MB core.
+// Both encoders now come from @unisim/media (0.4.0). M4A goes through
+// WebCodecs' own AAC encoder, so it costs no download at all; MP3 goes through
+// LAME compiled to JavaScript, loaded on first use. The licensing argument for
+// LAME over ffmpeg.wasm lives with the encoder now — see packages/media/src/mp3.ts.
 //
-// M4A goes through WebCodecs' own AAC encoder via @unisim/media, so it costs no
-// download at all.
+// ⚠️ This file used to carry its own copy of `encodeMp3` and `nearestLameRate`,
+// byte-identical to Universal Converter's including the comment. That is what
+// §10.6's audio extraction was about.
 
-/** LAME only accepts a fixed set of sample rates. */
-const LAME_RATES = [8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000]
-
-/** The rate LAME will accept that's closest to (and no higher than) the source. */
-export function nearestLameRate(sampleRate: number): number {
-  if (LAME_RATES.includes(sampleRate)) return sampleRate
-  const below = LAME_RATES.filter((r) => r < sampleRate)
-  return below.length > 0 ? Math.max(...below) : Math.min(...LAME_RATES)
-}
-
-/** Samples per encodeBuffer call — ~1152-frame MP3 granules, 1152 × 100. */
-const CHUNK = 115200
+export { nearestLameRate }
 
 export async function compressAudio(
   file: File,
@@ -85,42 +73,6 @@ async function render(decoded: AudioBuffer, settings: AudioSettings): Promise<Au
   source.connect(ctx.destination)
   source.start(0)
   return ctx.startRendering()
-}
-
-async function encodeMp3(
-  channels: Float32Array[],
-  sampleRate: number,
-  bitrateKbps: number,
-  onProgress: (fraction: number) => void,
-): Promise<Blob> {
-  if (channels.length === 0) throw new Error('There is no audio in this file to encode')
-
-  // Loaded on first use so LAME never lands in the initial bundle.
-  const { Mp3Encoder } = await import('@breezystack/lamejs')
-
-  // LAME takes mono or stereo; anything wider was downmixed by the render above.
-  const numChannels = Math.min(2, channels.length)
-  const encoder = new Mp3Encoder(numChannels, sampleRate, bitrateKbps)
-
-  const left = channelToInt16(channels[0])
-  const right = numChannels === 2 ? channelToInt16(channels[1]) : undefined
-  const parts: Uint8Array[] = []
-
-  for (let offset = 0; offset < left.length; offset += CHUNK) {
-    const end = Math.min(offset + CHUNK, left.length)
-    const block = right
-      ? encoder.encodeBuffer(left.subarray(offset, end), right.subarray(offset, end))
-      : encoder.encodeBuffer(left.subarray(offset, end))
-    if (block.length > 0) parts.push(block)
-    onProgress(end / left.length)
-    // Yield between chunks so the progress ring actually repaints.
-    await Promise.resolve()
-  }
-
-  const tail = encoder.flush()
-  if (tail.length > 0) parts.push(tail)
-
-  return new Blob(parts as BlobPart[], { type: 'audio/mpeg' })
 }
 
 /** "3:42 · stereo" for the file row. Costs a decode, so it is not run on drop. */
