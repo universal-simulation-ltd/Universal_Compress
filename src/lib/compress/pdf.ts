@@ -1,6 +1,6 @@
 import { PDFDocument } from 'pdf-lib'
 import { pdfjsLib, type PDFDocumentProxy } from '../pdfjs'
-import { compressedName } from '../layout'
+import { outputName } from '../layout'
 import type { CompressedFile, Level, PdfSettings } from '../types'
 
 // PDF compression, in two quite different modes.
@@ -32,7 +32,7 @@ export async function compressPdf(
   onProgress: (fraction: number) => void = () => {},
 ): Promise<CompressedFile> {
   const sourceBytes = await file.arrayBuffer()
-  const name = compressedName(file.name, 'pdf')
+  const name = outputName(file.name, 'pdf')
   onProgress(0.05)
 
   if (settings.level === 'light') {

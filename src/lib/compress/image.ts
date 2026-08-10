@@ -1,4 +1,4 @@
-import { compressedName } from '../layout'
+import { outputName } from '../layout'
 import { extensionOf } from '../kinds'
 import type { CompressedFile, ImageSettings } from '../types'
 
@@ -73,7 +73,7 @@ export async function compressImage(
     if (!blob) throw new Error('The image couldn’t be re-encoded')
     onProgress(1)
 
-    return { blob, name: compressedName(file.name, target.ext) }
+    return { blob, name: outputName(file.name, target.ext) }
   } finally {
     bitmap.close()
   }

@@ -1,5 +1,5 @@
 import { encodeAac, encodeMp3, nearestLameRate } from '@unisim/media'
-import { compressedName } from '../layout'
+import { outputName } from '../layout'
 import type { AudioSettings, CompressedFile } from '../types'
 
 // Audio: decode with the browser, re-render at the target channel count, then
@@ -37,11 +37,11 @@ export async function compressAudio(
 
   if (settings.format === 'm4a') {
     const blob = await encodeAac(channels, rendered.sampleRate, settings.bitrateKbps, half)
-    return { blob, name: compressedName(file.name, 'm4a') }
+    return { blob, name: outputName(file.name, 'm4a') }
   }
 
   const blob = await encodeMp3(channels, rendered.sampleRate, settings.bitrateKbps, half)
-  return { blob, name: compressedName(file.name, 'mp3') }
+  return { blob, name: outputName(file.name, 'mp3') }
 }
 
 // A throwaway context purely for decoding — its own rate doesn't affect the

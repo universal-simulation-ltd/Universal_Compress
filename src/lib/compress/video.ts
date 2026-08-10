@@ -1,5 +1,5 @@
 import { convertVideo, probeVideoFile, videoSupported } from '@unisim/media'
-import { compressedName } from '../layout'
+import { outputName } from '../layout'
 import type { CompressedFile, VideoCompressSettings } from '../types'
 
 // Video runs on WebCodecs — the browser's own hardware H.264 decoder and
@@ -38,7 +38,7 @@ export async function compressVideo(
   // convertVideo names the output for a *conversion* (same stem, .mp4). This app
   // has to guarantee it never collides with an .mp4 source, so the name is
   // rebuilt with the -compressed suffix every other kind uses.
-  return { blob: result.blob, name: compressedName(file.name, 'mp4') }
+  return { blob: result.blob, name: outputName(file.name, 'mp4') }
 }
 
 /** "1920 × 1080 · 2:14" for the file row, read from the header alone. */

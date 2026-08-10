@@ -1,3 +1,4 @@
+import { versionedName } from '@unisim/sdk'
 // The single page container. The navbar (via the SDK's `contentClassName`), the
 // circle, the options column and the footer all share it, so the suite switcher
 // lines up with the circle and the file list with the footer's GitHub link — at
@@ -24,9 +25,16 @@ export function savingPercent(before: number, after: number): number {
   return Math.round(((before - after) / before) * 100)
 }
 
-/** `photo.png` + 'jpg' → `photo-compressed.jpg`. Never overwrites the original. */
-export function compressedName(filename: string, ext: string): string {
-  const dot = filename.lastIndexOf('.')
-  const stem = dot > 0 ? filename.slice(0, dot) : filename
-  return `${stem}-compressed.${ext}`
+/**
+ * `photo.png` + 'jpg' → `photo-v1.jpg`. Never overwrites the original.
+ *
+ * Was `-compressed`, which was fine exactly once: compressing the output again
+ * gave `photo-compressed-compressed.jpg`, and the name then recorded how many
+ * times it had been round-tripped rather than what it was. `versionedName`
+ * PARSES the tail and replaces it, so a second pass is v2 — and it strips the
+ * old `-compressed` names on the way, so files made before this change tidy
+ * themselves up the next time they go through.
+ */
+export function outputName(filename: string, ext: string): string {
+  return versionedName(filename, { ext })
 }
