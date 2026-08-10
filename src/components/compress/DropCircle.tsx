@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { DropRing, useFileDrop } from '@unisim/sdk'
 import { ACCEPT } from '../../lib/kinds'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { useCompressStore, totals, type Item } from '../../stores/compressStore'
@@ -21,18 +21,19 @@ export default function DropCircle() {
   const items = useCompressStore((s) => s.items)
   const running = useCompressStore((s) => s.running)
   const addFiles = useCompressStore((s) => s.addFiles)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [over, setOver] = useState(false)
 
   const t = totals(items)
   const empty = t.eligible === 0
 
-  function handleDrop(e: React.DragEvent) {
-    e.preventDefault()
-    setOver(false)
-    const files = Array.from(e.dataTransfer.files)
-    if (files.length > 0) addFiles(files)
-  }
+  // The mechanics — drag depth, the hidden input, click and Enter and Space,
+  // resetting the value so the same file can be picked twice — now live in the
+  // SDK, shared with Universal Video. What stays here is everything that is
+  // actually about compressing: the four states, and what the middle says.
+  const drop = useFileDrop({
+    onFiles: addFiles,
+    accept: ACCEPT,
+    label: empty ? 'Drop a file here, or click to browse' : 'Drop more files here, or click to browse',
+  })
 
   // While the run is going the ring tracks it; once everything has finished it
   // stays full, so a completed batch reads as complete rather than snapping back
@@ -42,199 +43,26 @@ export default function DropCircle() {
   return (
     <div className="flex flex-col items-center">
       <div
-        onDragOver={(e) => {
-          e.preventDefault()
-          setOver(true)
-        }}
-        onDragLeave={() => setOver(false)}
-        onDrop={handleDrop}
-        onClick={() => inputRef.current?.click()}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            inputRef.current?.click()
-          }
-        }}
-        role="button"
-        tabIndex={0}
-        aria-label={empty ? 'Drop a file here, or click to browse' : 'Drop more files here, or click to browse'}
-        className={`relative aspect-square w-full max-w-[300px] cursor-pointer rounded-full transition-transform focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-600 ${
-          over ? 'scale-[1.02]' : ''
+        {...drop.dropzoneProps}
+        className={`relative w-full max-w-[300px] cursor-pointer rounded-full transition-transform focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-600 ${
+          drop.over ? 'scale-[1.02]' : ''
         }`}
       >
-        <Ring empty={empty} fill={fill} over={over} running={running} />
-
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1 px-10 text-center">
-          {empty ? <EmptyCentre over={over} /> : <LoadedCentre items={items} running={running} />}
-        </div>
+        {/* `still` while files are queued but nothing is running: neither the
+            idle twinkle ("alive and waiting") nor the busy chase ("working")
+            is true then, so the ring says nothing. */}
+        <DropRing
+          size="100%"
+          over={drop.over}
+          motion={empty ? 'idle' : running ? 'busy' : 'still'}
+          fill={empty ? 0 : fill}
+        >
+          {empty ? <EmptyCentre over={drop.over} /> : <LoadedCentre items={items} running={running} />}
+        </DropRing>
       </div>
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept={ACCEPT}
-        multiple
-        className="hidden"
-        onChange={(e) => {
-          const files = Array.from(e.target.files ?? [])
-          if (files.length > 0) addFiles(files)
-          // Reset so re-picking the same file fires change again.
-          e.target.value = ''
-        }}
-      />
+      <input {...drop.inputProps} className="hidden" />
     </div>
-  )
-}
-
-const R = 88
-const CIRCUMFERENCE = 2 * Math.PI * R
-
-/**
- * The ring is drawn as 25 individual pills rather than one dashed circle, so
- * each can be lit on its own.
- *
- * The trick is one `<circle>` per pill, each with a dash pattern of "one 10-unit
- * dash then a gap longer than the whole circumference" — so exactly one dash is
- * ever visible — positioned by its own `strokeDashoffset`. That keeps the
- * geometry identical to the `strokeDasharray="10 12"` it replaces (same arc
- * length, same spacing, same round caps) while making every pill a separate
- * element with its own colour and its own animation delay.
- *
- * 25 × 22.1 ≈ the full circumference, which is what closes the ring cleanly. A
- * count that doesn't divide evenly leaves a visible seam where the last gap is
- * the wrong width.
- */
-const PILLS = 25
-const PILL_PITCH = CIRCUMFERENCE / PILLS
-const PILL_DASH = 10
-/** Idle twinkle: roughly how long a pill waits between glows, before jitter. */
-const GLOW_SECONDS = 2.6
-/** Running chase: how long the lit group takes to travel once round. */
-const CHASE_SECONDS = 1.6
-
-/**
- * A stable pseudo-random number in 0–1 for pill `i`.
- *
- * Deliberately NOT `Math.random()`. The scatter has to be identical on every
- * render, or React re-rendering the circle — which it does on every drag-over,
- * every file added, every progress tick — would reshuffle which pills are lit
- * and make the ring flinch. It is also what makes the animation testable at
- * all: a screenshot of a random ring can only ever be eyeballed.
- *
- * The classic sine-fract hash. Cheap, no dependency, and its output is spread
- * evenly enough for two dozen values.
- */
-function pillNoise(i: number): number {
-  const x = Math.sin(i * 127.1 + 311.7) * 43758.5453
-  return x - Math.floor(x)
-}
-
-function Ring({
-  empty,
-  fill,
-  over,
-  running,
-}: {
-  empty: boolean
-  fill: number
-  over: boolean
-  running: boolean
-}) {
-  // Two different animations, because they say two different things.
-  //
-  //  • **Idle, empty** — pills glow in a SCATTERED order: a slow twinkle, no
-  //    direction, nothing to follow. It says the target is alive and waiting.
-  //  • **Running** — pills glow in INDEX order, so a lit group travels round
-  //    the ring. That reads as "working", which is only honest while something
-  //    actually is. It was the first thing tried on the empty state and it was
-  //    wrong there: a page that greets you with a spinner looks like a page
-  //    that hasn't finished loading.
-  //
-  // With files queued but nothing running, the track is plain and still —
-  // neither sentence applies, so the ring says nothing.
-  const pills = empty || running
-
-  return (
-    <svg viewBox="0 0 200 200" className="h-full w-full -rotate-90" aria-hidden="true">
-      <defs>
-        <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#FE8C01" />
-          <stop offset="100%" stopColor="#E05504" />
-        </linearGradient>
-      </defs>
-
-      {/* The disc. Tinted orange while a file is hovering over it, so the target
-          confirms itself before the mouse button comes up. */}
-      <circle cx="100" cy="100" r={R - 6} className={over ? 'fill-orange-50' : 'fill-white'} />
-
-      {/* Track. 25 separate pills whenever there is something to say (see above),
-          one plain circle when there isn't. During a run the solid progress fill
-          is drawn OVER these, so the chase is only visible in the part of the
-          ring still to be done — which is precisely the part still being worked
-          on. */}
-      {pills ? (
-        <g className="uc-ring-spin">
-          {Array.from({ length: PILLS }, (_, i) => (
-            <circle
-              key={i}
-              cx="100"
-              cy="100"
-              r={R}
-              fill="none"
-              strokeWidth="10"
-              strokeLinecap="round"
-              strokeDasharray={`${PILL_DASH} ${CIRCUMFERENCE}`}
-              strokeDashoffset={-i * PILL_PITCH}
-              className={over ? 'stroke-orange-400' : running ? 'uc-pill-chase' : 'uc-pill'}
-              style={
-                over
-                  ? undefined
-                  : running
-                    ? // Ordered delay → the lit group travels. Reads as working.
-                      { animationDelay: `${(i / PILLS) * CHASE_SECONDS}s` }
-                    : // Scattered delay AND scattered duration → no direction to
-                      // follow, and the pattern never quite repeats, so it reads
-                      // as a twinkle rather than as anything in progress.
-                      {
-                        animationDelay: `${pillNoise(i) * GLOW_SECONDS}s`,
-                        // A narrow spread. Wider and pills with similar periods
-                        // drift into phase and the ring pulses in clumps;
-                        // identical and the whole pattern loops visibly.
-                        animationDuration: `${2.4 + pillNoise(i + 97) * 1.0}s`,
-                      }
-              }
-            />
-          ))}
-        </g>
-      ) : (
-        <circle
-          cx="100"
-          cy="100"
-          r={R}
-          fill="none"
-          strokeWidth="10"
-          strokeLinecap="round"
-          className={over ? 'stroke-orange-400' : 'stroke-slate-200'}
-        />
-      )}
-
-      {/* Fill. `pathLength` is not used: an exact dash offset against the real
-          circumference keeps the cap sitting where the number says it is. */}
-      {!empty && fill > 0 && (
-        <circle
-          cx="100"
-          cy="100"
-          r={R}
-          fill="none"
-          stroke="url(#ring-grad)"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeDasharray={CIRCUMFERENCE}
-          strokeDashoffset={CIRCUMFERENCE * (1 - Math.max(0, Math.min(1, fill)))}
-          className="transition-[stroke-dashoffset] duration-300 ease-out"
-        />
-      )}
-    </svg>
   )
 }
 
