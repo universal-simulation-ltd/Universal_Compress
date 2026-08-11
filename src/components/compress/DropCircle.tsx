@@ -1,4 +1,4 @@
-import { DropRing, useFileDrop } from '@unisim/sdk'
+import { DropAnywhere, DropRing, useFileDrop } from '@unisim/sdk'
 import { ACCEPT } from '../../lib/kinds'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { useCompressStore, totals, type Item } from '../../stores/compressStore'
@@ -29,10 +29,16 @@ export default function DropCircle() {
   // resetting the value so the same file can be picked twice — now live in the
   // SDK, shared with Universal Video. What stays here is everything that is
   // actually about compressing: the four states, and what the middle says.
+  //
+  // `pageWide`: the circle is where to aim, not where you have to land. It also
+  // closes a real trap — a file dropped just outside the ring used to be handed
+  // to the browser, which navigated away from the page and took a finished
+  // batch with it, unsaved.
   const drop = useFileDrop({
     onFiles: addFiles,
     accept: ACCEPT,
     label: empty ? 'Drop a file here, or click to browse' : 'Drop more files here, or click to browse',
+    pageWide: true,
   })
 
   // While the run is going the ring tracks it; once everything has finished it
@@ -62,6 +68,12 @@ export default function DropCircle() {
       </div>
 
       <input {...drop.inputProps} className="hidden" />
+
+      {/* From `pageOver`, not `over`: on the ring itself the ring answers. */}
+      <DropAnywhere
+        show={drop.pageOver}
+        hint={empty ? 'PDF · MP4 · MOV · JPEG · PNG · WebP · MP3 · WAV · M4A' : 'Adds to the queue'}
+      />
     </div>
   )
 }
