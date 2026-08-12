@@ -1,4 +1,4 @@
-import { UniversalAppsNavBar } from '@unisim/sdk'
+import { UniversalAppsNavBar, UpdateNotice } from '@unisim/sdk'
 import AppMenu from './components/Header/AppMenu'
 import ProductLogo from './components/Header/ProductLogo'
 import CompressApp from './components/compress/CompressApp'
@@ -24,6 +24,13 @@ export default function App() {
         suiteSwitcherIconSrc={`${import.meta.env.BASE_URL}unisim-icon.png`}
         contentClassName={CONTAINER}
       />
+
+      {/* Renders nothing until this tab is genuinely running superseded code.
+          See the SDK's useAppUpdate: an autoUpdate PWA hands the new worker
+          control but leaves the running page on its old JavaScript. */}
+      <div className={`${CONTAINER} pt-4`}>
+        <UpdateNotice />
+      </div>
 
       <UsageTracker />
 
