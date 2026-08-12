@@ -117,7 +117,7 @@ export function PrimaryAction() {
           onClick={() => void downloadAll()}
           className="w-full rounded-xl bg-gradient-to-br from-[#FE8C01] to-[#E05504] px-4 py-3 text-[14px] font-bold text-white shadow-sm transition-opacity hover:opacity-95 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
         >
-          {t.done === 1 ? 'Save the compressed file' : `Save all ${t.done} files as a ZIP`}
+          {t.done === 1 ? 'Download the compressed file' : `Download all ${t.done} files as a ZIP`}
         </button>
       ) : (
         <button
@@ -141,7 +141,7 @@ export function PrimaryAction() {
           onClick={() => void downloadAll()}
           className="w-full rounded-xl bg-orange-500/12 px-4 py-2.5 text-[13px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-40"
         >
-          Save the {t.done} finished so far
+          Download the {t.done} finished so far
         </button>
       )}
 

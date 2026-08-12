@@ -72,7 +72,7 @@ function FileRow({ item }: { item: Item }) {
           onClick={() => downloadItem(item.id)}
           className="shrink-0 rounded-lg bg-orange-500/12 px-2.5 py-1.5 text-[11.5px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600"
         >
-          Save
+          Download
         </button>
       )}
 

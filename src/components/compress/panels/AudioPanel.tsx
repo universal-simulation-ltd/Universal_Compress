@@ -39,7 +39,7 @@ export default function AudioPanel({ count }: { count: string }) {
       </Field>
 
       <Collapsible label="Advanced" summary={advanced}>
-        <Field label="Save as">
+        <Field label="Download as">
           <Segmented
             options={FORMATS}
             value={settings.format}
