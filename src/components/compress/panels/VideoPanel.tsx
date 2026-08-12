@@ -133,7 +133,7 @@ export default function VideoPanel({ count }: { count: string }) {
           href="https://opensource.unisim.co.uk/video"
           target="_blank"
           rel="noreferrer"
-          className="font-semibold text-slate-500 underline-offset-2 hover:text-orange-600 hover:underline"
+          className="font-semibold text-slate-500 underline-offset-2 hover:text-orange-700 hover:underline"
         >
           Universal Video
         </a>{' '}
