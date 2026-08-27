@@ -5,7 +5,7 @@ import { probeDimensions } from '../lib/compress/image'
 import { probeVideo } from '../lib/compress/video'
 import { probeDuration } from '../lib/compress/audio'
 import { saveBlob } from '../lib/download'
-import { createZip } from '../lib/zip'
+import { createZip } from '@unisim/media'
 import {
   DEFAULT_AUDIO_SETTINGS,
   DEFAULT_IMAGE_SETTINGS,
