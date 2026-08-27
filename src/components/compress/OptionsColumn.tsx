@@ -17,7 +17,9 @@ export default function OptionsColumn() {
   const items = useCompressStore((s) => s.items)
   const kinds = kindsPresent(items)
 
-  if (kinds.length === 0) return <WaitingCard hasUnsupported={items.length > 0} />
+  // Reachable only when everything dropped is a file this app can't open: the
+  // queue being empty is the landing page's state now, not this screen's.
+  if (kinds.length === 0) return <NothingUsableCard />
 
   return (
     <div className="flex flex-col gap-4">
@@ -39,25 +41,27 @@ export default function OptionsColumn() {
 }
 
 /**
- * What sits in the column before anything has been dropped.
+ * What sits in the column when a drop landed but none of it can be compressed.
  *
- * An empty panel outline would be dead space. This says what the four engines
- * are, which doubles as the answer to "will it take my file?" — asked and
- * answered before anyone has to try it and find out.
+ * It used to double as the before-anything-is-dropped state, saying "the
+ * options appear here" — but an empty queue is the landing page now (see
+ * `../Landing/LandingPage.tsx`), so this card has one job and can say the one
+ * true thing rather than picking between two.
+ *
+ * It still lists the four engines, which is the answer to the question the
+ * person reading it has just been handed: not "will it take my file?" but
+ * "what WOULD it have taken?".
  */
-function WaitingCard({ hasUnsupported }: { hasUnsupported: boolean }) {
+function NothingUsableCard() {
   return (
     <div className="rounded-xl border border-slate-200 bg-white">
       <div className="border-b border-slate-200 px-4 py-3">
-        <span className="text-[12.5px] font-bold text-slate-900">
-          {hasUnsupported ? 'Nothing here can be compressed' : 'The options appear here'}
-        </span>
+        <span className="text-[12.5px] font-bold text-slate-900">Nothing here can be compressed</span>
       </div>
       <div className="flex flex-col gap-3 p-4">
         <p className="text-[11.5px] leading-relaxed text-slate-500">
-          {hasUnsupported
-            ? 'Every file in the list is one this app can’t open — the reason is on each row. Drop something below and its settings will appear here.'
-            : 'Drop a file into the circle and the settings for that kind of file appear here. Drop several kinds at once and you get one set of settings for each.'}
+          Every file in the list is one this app can’t open — the reason is on each row. Drop
+          something below and its settings will appear here.
         </p>
         <ul className="flex flex-col gap-2">
           <Capability

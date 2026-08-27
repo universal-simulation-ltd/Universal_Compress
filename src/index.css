@@ -70,6 +70,129 @@ body {
   animation: uc-ring-spin 48s linear infinite;
 }
 
+/* ---------- Landing illustration ---------- */
+
+/* Every part is a window on the single `--t` that CompressIllustration.tsx
+   writes — the same shape Universal PDF's and Universal Images' landing
+   illustrations use, so the three read as one family. A rule only has to name
+   its window; `--p` (clamped progress) and `--e` (the same, smoothstepped, so
+   each part eases on its own) fall out of the rule below. */
+
+.cmp-illu {
+  --t: 0;
+}
+
+/* Defaults for every part. The universal selector is scoped to the
+   illustration — about thirty nodes. */
+.cmp-illu * {
+  --from: 0;
+  --span: 1;
+  --p: clamp(0, (var(--t) - var(--from)) / var(--span), 1);
+  --e: calc(var(--p) * var(--p) * (3 - 2 * var(--p)));
+}
+
+/* The pile fans out from behind the front file. The two behind start perfectly
+   aligned and hidden by it, so frame 0 is one file, not three — the fan is what
+   says "drop as many as you like".
+
+   ⚠️ They fan LEFT and up, not down-right. Down-right runs the back cards into
+   the bottom plate's chevrons at the moment it lands, and a press plate passing
+   through the thing it is pressing is the one mistake this picture cannot
+   afford. */
+.cmp-illu .cmp-back {
+  --span: 0.18;
+}
+.cmp-illu .cmp-back-1 {
+  transform: rotate(calc(-2deg * var(--e))) translate(calc(-12px * var(--e)), calc(-14px * var(--e)));
+  --from: 0;
+}
+.cmp-illu .cmp-back-2 {
+  transform: rotate(calc(-4deg * var(--e))) translate(calc(-24px * var(--e)), calc(-28px * var(--e)));
+  --from: 0.05;
+}
+
+/* The squeeze itself. A UNIFORM scale about the pile's centre, not a squash:
+   scaling one axis distorts the type badges, and a compressor that visibly
+   stretches your file is telling the wrong story. 1 → 0.6; the line under it
+   says 14.2 MB → 5.4 MB, which is the same 62%. */
+.cmp-illu .cmp-stack {
+  transform: scale(calc(1 - 0.4 * var(--e)));
+  --from: 0.34;
+  --span: 0.28;
+}
+
+/* The ghost of the original bounds, fading in just before the press lands. */
+.cmp-illu .cmp-ghost {
+  opacity: calc(0.9 * var(--e));
+  --from: 0.28;
+  --span: 0.10;
+}
+
+/* The plates arrive... */
+.cmp-illu .cmp-plate-in {
+  --from: 0.16;
+  --span: 0.16;
+}
+.cmp-illu .cmp-plate-in-top {
+  transform: translateY(calc(-170px * (1 - var(--e))));
+}
+.cmp-illu .cmp-plate-in-bottom {
+  transform: translateY(calc(170px * (1 - var(--e))));
+}
+
+/* ...press, in exactly the window the pile shrinks in, so the plates stay in
+   contact with it the whole way down rather than closing on empty air.
+   ⚠️ The two offsets are the pile's own geometry scaled: fanned, it runs from
+   y=127 to y=305, which is 103 above the 250,230 origin and 75 below; at 0.6
+   those become 62 and 45, moving the two edges 41 and 30 inward. The plates
+   travel 40 and 33 — a shade less, so they stay just clear of the card rather
+   than biting into it. If the 0.4 scale above changes, these change with it. */
+.cmp-illu .cmp-plate-press {
+  --from: 0.34;
+  --span: 0.28;
+}
+.cmp-illu .cmp-plate-press-top {
+  transform: translateY(calc(40px * var(--e)));
+}
+.cmp-illu .cmp-plate-press-bottom {
+  transform: translateY(calc(-33px * var(--e)));
+}
+
+/* ...and leave, clearing the frame before the badge stamps into it. */
+.cmp-illu .cmp-plate-out {
+  --from: 0.62;
+  --span: 0.14;
+}
+.cmp-illu .cmp-plate-out-top {
+  transform: translateY(calc(-260px * var(--e)));
+}
+.cmp-illu .cmp-plate-out-bottom {
+  transform: translateY(calc(260px * var(--e)));
+}
+
+/* Before, then after, in the same place — with a beat of nothing between. */
+.cmp-illu .cmp-size-before {
+  opacity: calc(1 - var(--e));
+  --from: 0.56;
+  --span: 0.10;
+}
+.cmp-illu .cmp-size-after {
+  opacity: var(--e);
+  --from: 0.70;
+  --span: 0.10;
+}
+
+/* The saving stamps last, and the sweep holds on it before turning back. */
+.cmp-illu .cmp-badge {
+  transform: scale(var(--e));
+  opacity: var(--e);
+  --from: 0.80;
+  --span: 0.14;
+}
+
+/* Reduced motion is handled in CompressIllustration.tsx, which parks `--t` at 1
+   and never starts the loop — the finished frame, not a slower version of it. */
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

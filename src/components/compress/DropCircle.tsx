@@ -1,4 +1,5 @@
 import { DropAnywhere, DropRing, useFileDrop } from '@unisim/sdk'
+import DropWatermark from '../Landing/DropWatermark'
 import { ACCEPT } from '../../lib/kinds'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { useCompressStore, totals, type Item } from '../../stores/compressStore'
@@ -56,12 +57,24 @@ export default function DropCircle() {
       >
         {/* `still` while files are queued but nothing is running: neither the
             idle twinkle ("alive and waiting") nor the busy chase ("working")
-            is true then, so the ring says nothing. */}
+            is true then, so the ring says nothing.
+
+            The backdrop is drawn only while the ring is empty — the same rule
+            Universal PDF and Universal Images follow. Once there is a queue the
+            middle carries live numbers, and a line drawing behind a count that
+            changes several times a second is noise under the one thing being
+            read.
+
+            ⚠️ `false`, not `undefined`: from SDK 0.104 an omitted `watermark`
+            draws the suite's GENERIC one rather than nothing, so leaving it out
+            here would put a drawing behind the live figures — exactly the case
+            this is switching off. */}
         <DropRing
           size="100%"
           over={drop.over}
           motion={empty ? 'idle' : running ? 'busy' : 'still'}
           fill={empty ? 0 : fill}
+          watermark={empty ? <DropWatermark /> : false}
         >
           {empty ? <EmptyCentre over={drop.over} /> : <LoadedCentre items={items} running={running} />}
         </DropRing>
