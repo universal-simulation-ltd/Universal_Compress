@@ -25,13 +25,6 @@ export default function LandingPage() {
       {/* Kept above the fold on the landing page too, deliberately. It is the
           first question anyone arriving from a search has, and moving it behind
           a drop would answer it only for people who had already taken the risk. */}
-      <PrivacyNote
-        repo="https://github.com/universal-simulation-ltd/Universal_Compress"
-        subject="Your files"
-        plural
-        badge="on-device · works offline"
-      />
-
       <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         {/* Desktop keeps the illustration as its own column. On a phone it is
             hidden rather than stacked: as a block above or below it is a full
@@ -76,6 +69,18 @@ export default function LandingPage() {
               <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> Batch ZIP download</li>
             </ul>
           </div>
+
+          {/* ⚠️ Under the card, NOT above the fold. It used to sit at the top of
+              this page, and the illustration's compress animation swept its
+              orange bars straight across the note — a privacy claim you cannot
+              read for two seconds of every loop (James, screenshot, 2026-08-28).
+              This is also the suite's placement everywhere else. */}
+          <PrivacyNote
+            className="mt-4"
+            repo="https://github.com/universal-simulation-ltd/Universal_Compress"
+            subject="Your files"
+            plural
+          />
         </div>
       </div>
     </div>

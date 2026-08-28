@@ -40,7 +40,6 @@ export default function CompressApp() {
         repo="https://github.com/universal-simulation-ltd/Universal_Compress"
         subject="Your files"
         plural
-        badge="on-device · works offline"
       />
 
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.85fr)]">
