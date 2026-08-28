@@ -78,6 +78,7 @@ export default function LandingPage() {
           <PrivacyNote
             className="mt-4"
             repo="https://github.com/universal-simulation-ltd/Universal_Compress"
+            proof="https://github.com/universal-simulation-ltd/Universal_Compress/blob/main/PRIVACY.md"
             subject="Your files"
             plural
           />

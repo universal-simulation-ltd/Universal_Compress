@@ -38,6 +38,7 @@ export default function CompressApp() {
     <div className={`${CONTAINER} flex flex-col gap-4 py-5`}>
       <PrivacyNote
         repo="https://github.com/universal-simulation-ltd/Universal_Compress"
+        proof="https://github.com/universal-simulation-ltd/Universal_Compress/blob/main/PRIVACY.md"
         subject="Your files"
         plural
       />
