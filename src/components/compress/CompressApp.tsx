@@ -1,10 +1,10 @@
+import { PrivacyNote } from '@unisim/sdk'
 import { CONTAINER } from '../../lib/layout'
 import { useCompressStore } from '../../stores/compressStore'
 import LandingPage from '../Landing/LandingPage'
 import DropCircle from './DropCircle'
 import FileList from './FileList'
 import OptionsColumn, { PrimaryAction } from './OptionsColumn'
-import PrivacyStrip from './PrivacyStrip'
 
 /**
  * Two screens, and the queue picks which one.
@@ -36,7 +36,12 @@ export default function CompressApp() {
 
   return (
     <div className={`${CONTAINER} flex flex-col gap-4 py-5`}>
-      <PrivacyStrip />
+      <PrivacyNote
+        repo="https://github.com/universal-simulation-ltd/Universal_Compress"
+        subject="Your files"
+        plural
+        badge="on-device · works offline"
+      />
 
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.85fr)]">
         <div className="flex flex-col gap-4">

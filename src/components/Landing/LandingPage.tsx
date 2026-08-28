@@ -1,5 +1,5 @@
+import { PrivacyNote } from '@unisim/sdk'
 import DropCircle from '../compress/DropCircle'
-import PrivacyStrip from '../compress/PrivacyStrip'
 import CompressIllustration from './CompressIllustration'
 import { CONTAINER } from '../../lib/layout'
 
@@ -25,7 +25,12 @@ export default function LandingPage() {
       {/* Kept above the fold on the landing page too, deliberately. It is the
           first question anyone arriving from a search has, and moving it behind
           a drop would answer it only for people who had already taken the risk. */}
-      <PrivacyStrip />
+      <PrivacyNote
+        repo="https://github.com/universal-simulation-ltd/Universal_Compress"
+        subject="Your files"
+        plural
+        badge="on-device · works offline"
+      />
 
       <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         {/* Desktop keeps the illustration as its own column. On a phone it is
@@ -46,7 +51,6 @@ export default function LandingPage() {
           </h1>
           <p className="mt-3 max-w-md text-slate-600">
             Drop one or many, of any kind. The settings for whatever you dropped appear next to it.
-            Nothing leaves your device.
           </p>
 
           <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
