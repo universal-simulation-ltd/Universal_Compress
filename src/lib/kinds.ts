@@ -20,7 +20,12 @@ export type DetectedKind = FileKind | 'unsupported'
 export const PDF_EXTS = ['pdf']
 /** ISO-BMFF only — @unisim/media's demuxer reads MP4 boxes, nothing else. */
 export const VIDEO_EXTS = ['mp4', 'm4v', 'mov']
-export const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'bmp']
+// `heic`/`heif` are here rather than in KNOWN_REFUSALS below, where they used
+// to sit saying "HEIC needs Apple's decoder, which browsers don't expose". That
+// was true when it was written and is not any more: the app carries libheif now
+// (see `compress/image.ts`), so the format an iPhone hands you compresses like
+// anything else.
+export const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'bmp', 'heic', 'heif']
 export const AUDIO_EXTS = ['mp3', 'wav', 'm4a', 'aac', 'flac', 'ogg', 'oga', 'opus', 'aiff', 'aif']
 
 /**
@@ -34,8 +39,6 @@ const KNOWN_REFUSALS: Record<string, string> = {
   avi: 'AVI is an older container this app can’t open. Remux to MP4 first.',
   wmv: 'WMV is a Windows-only container with no browser decoder. Remux to MP4 first.',
   flv: 'FLV has no browser decoder. Remux to MP4 first.',
-  heic: 'HEIC needs Apple’s decoder, which browsers don’t expose. Export as JPEG and it will compress fine.',
-  heif: 'HEIF needs Apple’s decoder, which browsers don’t expose. Export as JPEG and it will compress fine.',
   zip: 'A ZIP is already compressed — squeezing it again would only make it bigger.',
   rar: 'A RAR is already compressed — squeezing it again would only make it bigger.',
   '7z': 'A 7z archive is already compressed — squeezing it again would only make it bigger.',
@@ -66,15 +69,16 @@ export function detectKind(file: File): Detection {
 
   // No extension we know. Fall back to the MIME type, which is right often
   // enough to be worth asking — but only for the families we can actually
-  // handle, so an `image/heic` doesn't get sent to a decoder that will fail.
-  if (mime.startsWith('image/') && !mime.includes('hei')) return { kind: 'image' }
+  // handle. `image/heic` used to be excluded here because it would have reached
+  // a decoder that failed; it is a first-class image now.
+  if (mime.startsWith('image/')) return { kind: 'image' }
   if (mime.startsWith('audio/')) return { kind: 'audio' }
   if (mime === 'video/mp4' || mime === 'video/quicktime') return { kind: 'video' }
 
   return {
     kind: 'unsupported',
     reason: ext
-      ? `.${ext} isn’t a format this app can open. It handles PDF, MP4/M4V/MOV, JPEG/PNG/WebP/AVIF/GIF/BMP and the common audio formats.`
+      ? `.${ext} isn’t a format this app can open. It handles PDF, MP4/M4V/MOV, JPEG/PNG/WebP/AVIF/HEIC/GIF/BMP and the common audio formats.`
       : 'This file has no extension and no recognisable type, so there is nothing to tell us how to open it.',
   }
 }

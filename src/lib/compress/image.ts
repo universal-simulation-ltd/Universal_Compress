@@ -23,6 +23,13 @@ function targetFormat(file: File, settings: ImageSettings): { mime: string; ext:
     case 'jpg':
     case 'jpeg':
       return { mime: 'image/jpeg', ext: 'jpg', lossy: true }
+    // No browser can ENCODE HEIC, so "keep" cannot mean keep here. WebP is the
+    // closest thing: lossy like the source, smaller than JPEG at the same
+    // quality, and openable everywhere. Pick JPEG explicitly if the photo is
+    // going somewhere old.
+    case 'heic':
+    case 'heif':
+      return { mime: 'image/webp', ext: 'webp', lossy: true }
     case 'avif':
       return { mime: 'image/avif', ext: 'avif', lossy: true }
     case 'webp':
@@ -95,9 +102,57 @@ export function targetSize(
   }
 }
 
+const HEIC_EXT_RE = /\.(heic|heif)$/i
+const HEIC_MIME = new Set(['image/heic', 'image/heif', 'image/heic-sequence', 'image/heif-sequence'])
+
+/**
+ * Is this the thing an iPhone hands you?
+ *
+ * ⚠️ The extension test is not belt-and-braces, it is the one that fires. A
+ * `.heic` copied off a phone routinely arrives with `file.type === ''` on
+ * Windows, because the OS has no MIME registered for it.
+ */
+function isHeic(file: File): boolean {
+  return HEIC_MIME.has(file.type.toLowerCase()) || HEIC_EXT_RE.test(file.name)
+}
+
+/**
+ * HEIC/HEIF → an ImageBitmap, so the rest of this file can treat an iPhone
+ * photo as any other raster.
+ *
+ * This is the only input in the app that needs a decoder shipped with it, and
+ * it is ~3MB, so it is dynamic-imported on the first HEIC and costs nothing to
+ * anyone who never drops one.
+ *
+ * ⚠️ **`heic-to` (libheif 1.19), NOT `heic2any`.** heic2any's last release
+ * bundles a libheif from 2019, which fails on every photo a current iPhone
+ * takes — they store the main image as a `grid` of HEVC tiles with an HDR gain
+ * map and a `tmap` item beside it, and a 2019 build handles none of that. It
+ * decodes a synthetic single-item fixture perfectly, which is exactly how a
+ * test goes green on something the app cannot do. **A generated HEIC does not
+ * test HEIC.** Same call as Universal Converter and Universal Images; the long
+ * version is in the Universal Images section of `Docs_UNI_SIM/landmines.md`.
+ */
+async function heicToBitmap(file: File): Promise<ImageBitmap> {
+  const { heicTo } = await import('heic-to')
+  try {
+    return await heicTo({ blob: file, type: 'bitmap' })
+  } catch (e) {
+    // Name the cause. A friendly sentence that hides the decoder's own words
+    // blames the file for something the library did.
+    const why = e instanceof Error ? e.message : String(e)
+    throw new Error(`This HEIC couldn’t be decoded — ${why}`)
+  }
+}
+
 // createImageBitmap covers PNG/JPEG/WebP/GIF/AVIF wherever the browser can
 // decode them at all.
 async function decode(file: File): Promise<ImageBitmap> {
+  // Before the try, not inside its catch: on Safari `createImageBitmap` would
+  // succeed on a HEIC and never reach a fallback, so Safari and everything else
+  // would take different paths and only one of them would be the tested one.
+  if (isHeic(file)) return await heicToBitmap(file)
+
   try {
     return await createImageBitmap(file)
   } catch {
@@ -139,13 +194,19 @@ function canEncode(mime: string): Promise<boolean> {
   return probe
 }
 
-/** "1920 × 1080" for the file row, read without decoding the whole image. */
-export function probeDimensions(file: File): Promise<string | null> {
+/**
+ * The source's pixel dimensions, read without decoding the whole image.
+ *
+ * Returns the numbers rather than the "1920 × 1080" string it used to: the row
+ * still needs the string, but the size estimate needs the pixel count to scale
+ * one measured sample encode across the rest of the queue. The store formats.
+ */
+export function probeDimensions(file: File): Promise<{ width: number; height: number } | null> {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file)
     const img = new Image()
     let settled = false
-    const finish = (value: string | null) => {
+    const finish = (value: { width: number; height: number } | null) => {
       if (settled) return
       settled = true
       clearTimeout(timer)
@@ -153,7 +214,7 @@ export function probeDimensions(file: File): Promise<string | null> {
       resolve(value)
     }
     const timer = setTimeout(() => finish(null), 5000)
-    img.onload = () => finish(`${img.naturalWidth} × ${img.naturalHeight}`)
+    img.onload = () => finish({ width: img.naturalWidth, height: img.naturalHeight })
     img.onerror = () => finish(null)
     img.src = url
   })

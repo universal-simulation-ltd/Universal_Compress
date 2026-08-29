@@ -63,7 +63,7 @@ export default function LandingPage() {
             <ul className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-600">
               <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> PDF — repack or rasterise</li>
               <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> MP4, M4V, MOV</li>
-              <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> JPEG, PNG, WebP, AVIF</li>
+              <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> JPEG, PNG, WebP, HEIC</li>
               <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> MP3, WAV, M4A, FLAC</li>
               <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> Mixed drops, one queue</li>
               <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> Batch ZIP download</li>
