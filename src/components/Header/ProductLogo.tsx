@@ -36,16 +36,22 @@ export default function ProductLogo() {
     >
       <style>{CSS}</style>
       <svg viewBox="0 0 64 64" className="h-6 w-6" aria-hidden="true">
-        <rect x="0" y="0" width="64" height="64" rx="14" fill="#0f172a" />
-        <g fill="none" strokeWidth={4.8} strokeLinecap="round" strokeLinejoin="round" stroke="#fe8c01" className="uam-compress-jaws">
+        <defs>
+          <linearGradient id="uam-nav-compress-tile" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#fe8c01" />
+            <stop offset="1" stopColor="#e05504" />
+          </linearGradient>
+        </defs>
+        <rect width="64" height="64" rx="14" fill="url(#uam-nav-compress-tile)" />
+        <g fill="none" strokeWidth={4.8} strokeLinecap="round" strokeLinejoin="round" stroke="#ffffff" className="uam-compress-jaws">
           <path d="M32 10v12" />
           <path d="M25.2 15.2 32 22l6.8-6.8" />
         </g>
-        <g fill="none" strokeWidth={4.8} strokeLinecap="round" strokeLinejoin="round" stroke="#fe8c01" className="uam-compress-jawsLower">
+        <g fill="none" strokeWidth={4.8} strokeLinecap="round" strokeLinejoin="round" stroke="#ffffff" className="uam-compress-jawsLower">
           <path d="M32 54V42" />
           <path d="M25.2 48.8 32 42l6.8 6.8" />
         </g>
-        <rect x={13} y={29.2} width={38} height={5.6} rx={2.8} fill="#ff9a1f" className="uam-compress-slab" />
+        <rect x={13} y={29.2} width={38} height={5.6} rx={2.8} fill="#fed7aa" className="uam-compress-slab" />
       </svg>
     </span>
   )
