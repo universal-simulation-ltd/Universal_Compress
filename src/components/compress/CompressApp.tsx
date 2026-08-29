@@ -4,7 +4,8 @@ import { useCompressStore } from '../../stores/compressStore'
 import LandingPage from '../Landing/LandingPage'
 import DropCircle from './DropCircle'
 import FileList from './FileList'
-import OptionsColumn, { PrimaryAction } from './OptionsColumn'
+import KindStrip from './KindStrip'
+import OptionsColumn from './OptionsColumn'
 
 /**
  * Two screens, and the queue picks which one.
@@ -19,12 +20,19 @@ import OptionsColumn, { PrimaryAction } from './OptionsColumn'
  * THE WORKING SCREEN: one screen, two columns.
  *
  * Left is the circle and whatever has been dropped into it; right is the
- * settings for whatever that turned out to be. There is no mode to choose and
- * no tab to find — the file picks the tools, which is the entire idea.
+ * settings for whatever that turned out to be, and every button. There is no
+ * mode to choose and no tab to find — the file picks the tools, which is the
+ * entire idea.
  *
- * At `lg` and below the two columns stack, and the order is already right:
- * circle, button, list, settings. Somebody who drops one photo and presses the
- * orange button never scrolls at all.
+ * ⚠️ **The left column has no actions on it at all** (owner ask, 2026-08-29).
+ * It answers "what have I got": the circle, then a tile per kind wearing the
+ * mark of the Universal App that owns that format, then the file list. Compress
+ * and Download both live in `ActionCard` at the top of the right column, so
+ * there is exactly one place on the page where anything happens.
+ *
+ * At `lg` and below the two columns stack, and the order is still right:
+ * circle, tiles, list, then the action card at the head of the settings.
+ * Somebody who drops one photo and presses the orange button scrolls once.
  */
 export default function CompressApp() {
   // The whole queue, not a derived count: a selector returning `items.length`
@@ -47,10 +55,11 @@ export default function CompressApp() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-5 rounded-xl border border-slate-200 bg-white px-4 py-8 sm:px-8">
             <DropCircle />
-            {/* PrimaryAction owns its own wrapper so that when it renders
-                nothing — the empty state — it contributes no flex child and no
-                gap, and the card closes up under the circle. */}
-            <PrimaryAction />
+            {/* What was dropped, in the marks of the Universal Apps that own
+                those formats. KindStrip owns its own wrapper so that when it
+                renders nothing — the empty state — it contributes no flex child
+                and no gap, and the card closes up under the circle. */}
+            <KindStrip />
           </div>
           <FileList />
         </div>
