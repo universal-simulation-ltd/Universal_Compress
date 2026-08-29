@@ -45,8 +45,15 @@ const cache = new Map<string, number | null>()
  * The three run one after another rather than at once, for the same reason the
  * queue does (see `compressAll`): the image and PDF samples are real encodes,
  * and three of them in parallel on a phone is how a tab gets killed.
+ *
+ * ⚠️ **`all` is false while the panel is shut, and that is not a micro-
+ * optimisation.** Panels are closed by default, and a shut one shows exactly one
+ * number — the level it is set to. Pricing the other two anyway would render six
+ * PDF pages nobody asked to see before the first figure appeared, on a phone,
+ * every time a file is dropped. Opening the panel turns them on; they arrive as
+ * "…" and then resolve.
  */
-export function useLevelEstimates(kind: FileKind): LevelEstimates {
+export function useLevelEstimates(kind: FileKind, all = true): LevelEstimates {
   const items = useCompressStore((s) => s.items)
   const pdf = useCompressStore((s) => s.pdf)
   const video = useCompressStore((s) => s.video)
@@ -73,8 +80,9 @@ export function useLevelEstimates(kind: FileKind): LevelEstimates {
     // tick would otherwise start a real encode.
     const timer = window.setTimeout(async () => {
       const input: EstimateItem[] = mine.map((i) => ({ file: i.file, meta: i.meta }))
+      const wanted = all ? LEVELS : LEVELS.filter((l) => l.value === selected)
 
-      for (const { value: level } of LEVELS) {
+      for (const { value: level } of wanted) {
         const forLevel = settingsFor(kind, level, selected, settings)
         const key = `${kind}|${queueSig}|${JSON.stringify(forLevel[kind])}`
 
@@ -100,7 +108,7 @@ export function useLevelEstimates(kind: FileKind): LevelEstimates {
     // `mine` and `settings` are rebuilt every render; the two signature strings
     // are their stable identity, which is what this should actually depend on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kind, queueSig, liveSig, selected])
+  }, [kind, queueSig, liveSig, selected, all])
 
   if (mine.length === 0) return WORKING
   return estimates

@@ -1,22 +1,25 @@
 import { formatBytes, savingPercent } from '../../lib/layout'
 import type { FileKind } from '../../lib/kinds'
 import { useCompressStore } from '../../stores/compressStore'
-import type { Level } from '../../lib/types'
+import { LEVELS, type Level } from '../../lib/types'
 import { useLevelEstimates } from './useLevelEstimates'
 
 /**
- * The predicted sizes, in the two places a panel shows them: one on each level
- * button, and one sentence underneath comparing the chosen level with what was
- * dropped.
+ * The predicted sizes, in the three places a panel shows them: one on each level
+ * button, one sentence underneath comparing the chosen level with what was
+ * dropped, and — when the panel is shut — the one line that has to carry both.
  *
- * Both come from the same estimate. The button answers "which of these three",
- * the sentence answers "is this worth doing at all" — and that second question
- * is the one an already-optimised file gets wrong, so it says *"already about
- * as small as it goes"* rather than reporting a proud 0%.
+ * All three come from the same estimate. The button answers "which of these
+ * three", the sentence answers "is this worth doing at all" — and that second
+ * question is the one an already-optimised file gets wrong, so it says *"already
+ * about as small as it goes"* rather than reporting a proud 0%.
+ *
+ * `expanded` is passed straight through to the estimator: a shut panel shows one
+ * number and should pay for one, not three. See `useLevelEstimates`.
  */
-export function useLevelSizes(kind: FileKind) {
+export function useLevelSizes(kind: FileKind, expanded = true) {
   const items = useCompressStore((s) => s.items)
-  const estimates = useLevelEstimates(kind)
+  const estimates = useLevelEstimates(kind, expanded)
   const settings = useCompressStore((s) => s[kind])
 
   const mine = items.filter((i) => i.kind === kind)
@@ -48,5 +51,29 @@ export function useLevelSizes(kind: FileKind) {
       </p>
     ) : null
 
-  return { sub, note }
+  // The shut panel's whole account of itself: what it is set to, what that
+  // costs, and what it saves. LEVELS holds the capitalised label so this cannot
+  // drift from the buttons underneath.
+  const levelLabel = LEVELS.find((l) => l.value === settings.level)?.label ?? settings.level
+  const saved = selected.state === 'ready' ? savingPercent(sourceBytes, selected.bytes) : 0
+  const summary = (
+    <>
+      <span className="font-semibold text-slate-600">{levelLabel}</span>
+      {selected.state === 'ready' && (
+        <>
+          {' · '}
+          <span className="tabular-nums">≈ {formatBytes(selected.bytes)}</span>
+          {saved >= 3 && (
+            <>
+              {' · '}
+              <span className="font-semibold text-[#166534]">{saved}% smaller</span>
+            </>
+          )}
+        </>
+      )}
+      {selected.state === 'working' && ' · working out the size…'}
+    </>
+  )
+
+  return { sub, note, summary }
 }

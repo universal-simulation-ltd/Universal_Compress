@@ -24,8 +24,6 @@ export default function OptionsColumn() {
 
   return (
     <div className="flex flex-col gap-4">
-      <ActionCard />
-
       {kinds.map((kind) => {
         const count = kindLabel(kind, items.filter((i) => i.kind === kind).length)
         switch (kind) {
@@ -39,6 +37,7 @@ export default function OptionsColumn() {
             return <AudioPanel key={kind} count={count} />
         }
       })}
+
     </div>
   )
 }
@@ -114,10 +113,13 @@ function Capability({ label, body }: { label: string; body: string }) {
  * button, and the other becomes a quiet second row. Two gradient buttons on top
  * of each other is the shape of a screen that cannot decide.
  *
- * Top of the column rather than bottom is a phone decision: below `lg` the two
- * columns stack as circle, tiles, list, settings — so a card at the foot would
- * put the button under every panel, and someone who dropped one photo would
- * have to scroll past settings they never wanted in order to press Compress.
+ * ⚠️ **It sits at the BOTTOM of the column, and only because the panels shut.**
+ * It was at the top for exactly one reason — below `lg` the columns stack as
+ * circle, tiles, list, settings, and a card at the foot put the button under
+ * four open panels nobody had asked to see. Collapsing them (owner ask,
+ * 2026-08-29) turned that scroll into four header rows, so the button can go
+ * where it reads best: after the thing it acts on. **If the panels are ever
+ * opened by default again, this has to move back up.**
  */
 export function ActionCard() {
   const items = useCompressStore((s) => s.items)

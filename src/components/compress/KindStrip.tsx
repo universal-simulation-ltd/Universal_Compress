@@ -1,5 +1,5 @@
-import { APP_MARKS } from '@unisim/sdk'
-import { kindLabel, type DetectedKind, type FileKind } from '../../lib/kinds'
+import { APP_MARKS, useFileDrop } from '@unisim/sdk'
+import { ACCEPT, kindLabel, type DetectedKind, type FileKind } from '../../lib/kinds'
 import { formatBytes } from '../../lib/layout'
 import { useCompressStore, type Item } from '../../stores/compressStore'
 
@@ -53,12 +53,26 @@ const RESOLVE_MARKS = `
 
 export default function KindStrip() {
   const items = useCompressStore((s) => s.items)
+  const addFiles = useCompressStore((s) => s.addFiles)
+
+  // The "+" tile is a drop target as well as a button, so a file dragged onto
+  // the row of tiles lands where it looks like it should. `pageWide` is OFF
+  // here — the circle owns the whole-page listener, and two page-wide zones
+  // would hand the page back and forth for no gain (see the SDK's note: they
+  // register on a stack and the last mounted wins).
+  const add = useFileDrop({
+    onFiles: addFiles,
+    accept: ACCEPT,
+    clickToBrowse: true,
+    label: 'Add more files',
+  })
+
   if (items.length === 0) return null
 
   const groups = groupByKind(items)
 
   return (
-    <div className="flex w-full max-w-[340px] flex-wrap items-stretch justify-center gap-2">
+    <div className="flex w-full max-w-[460px] flex-wrap items-stretch justify-center gap-2">
       <style>{RESOLVE_MARKS}</style>
       {groups.map((g) => (
         <div
@@ -96,6 +110,33 @@ export default function KindStrip() {
           )}
         </div>
       ))}
+
+      {/* Add more, from the file picker — the same job the circle does, put
+          where the eye already is once there is something in the queue. */}
+      <div
+        {...add.dropzoneProps}
+        title="Add more files"
+        className={`flex w-[108px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed px-2 py-2.5 transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 ${
+          add.over
+            ? 'border-orange-400 bg-orange-50'
+            : 'border-slate-300 bg-white hover:border-orange-400 hover:bg-orange-50/40'
+        }`}
+      >
+        <span
+          className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+            add.over ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
+          }`}
+          aria-hidden="true"
+        >
+          <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M10 4v12M4 10h12" />
+          </svg>
+        </span>
+        <span className="text-center text-[11.5px] font-bold leading-tight text-slate-700">Add more</span>
+        <span className="text-[10.5px] text-slate-400">or drop</span>
+      </div>
+
+      <input {...add.inputProps} className="hidden" />
     </div>
   )
 }

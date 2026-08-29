@@ -5,7 +5,7 @@ import LandingPage from '../Landing/LandingPage'
 import DropCircle from './DropCircle'
 import FileList from './FileList'
 import KindStrip from './KindStrip'
-import OptionsColumn from './OptionsColumn'
+import OptionsColumn, { ActionCard } from './OptionsColumn'
 
 /**
  * Two screens, and the queue picks which one.
@@ -24,15 +24,17 @@ import OptionsColumn from './OptionsColumn'
  * mode to choose and no tab to find — the file picks the tools, which is the
  * entire idea.
  *
- * ⚠️ **The left column has no actions on it at all** (owner ask, 2026-08-29).
- * It answers "what have I got": the circle, then a tile per kind wearing the
- * mark of the Universal App that owns that format, then the file list. Compress
- * and Download both live in `ActionCard` at the top of the right column, so
- * there is exactly one place on the page where anything happens.
+ * ⚠️ **The left column answers "what have I got"; the right one is everything
+ * that happens** (owner asks, 2026-08-29, over three passes). Left is the kind
+ * tiles and the file list. Right is the settings — shut, one line each — then
+ * the drop circle, then Compress and Download. The circle is DOWN there rather
+ * than at the top left because "drop more" and "go" are the two things anyone
+ * does from this screen twice, and they had ended up at opposite corners.
  *
- * At `lg` and below the two columns stack, and the order is still right:
- * circle, tiles, list, then the action card at the head of the settings.
- * Somebody who drops one photo and presses the orange button scrolls once.
+ * At `lg` and below the two columns stack: tiles, list, settings, circle,
+ * button. That order only works because the panels are shut by default — four
+ * open ones would put the circle and the button below a screen of controls
+ * nobody asked for.
  */
 export default function CompressApp() {
   // The whole queue, not a derived count: a selector returning `items.length`
@@ -51,20 +53,28 @@ export default function CompressApp() {
         plural
       />
 
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.85fr)]">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)]">
+        {/* Left: what you dropped. The tiles wear the marks of the Universal
+            Apps that own those formats, with a "+" tile that opens the picker;
+            the list under them is the same queue file by file. */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col items-center gap-5 rounded-xl border border-slate-200 bg-white px-4 py-8 sm:px-8">
-            <DropCircle />
-            {/* What was dropped, in the marks of the Universal Apps that own
-                those formats. KindStrip owns its own wrapper so that when it
-                renders nothing — the empty state — it contributes no flex child
-                and no gap, and the card closes up under the circle. */}
+          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6 sm:px-8">
             <KindStrip />
           </div>
           <FileList />
         </div>
 
-        <OptionsColumn />
+        {/* Right: what will happen to it, and the button that does it. The
+            circle sits directly above the button (owner ask, 2026-08-29) —
+            "drop more" and "go" are the two things anyone does from here, and
+            they were at opposite ends of the page. */}
+        <div className="flex flex-col gap-4">
+          <OptionsColumn />
+          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6">
+            <DropCircle />
+          </div>
+          <ActionCard />
+        </div>
       </div>
     </div>
   )

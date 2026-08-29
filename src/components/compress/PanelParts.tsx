@@ -5,22 +5,63 @@ import { useState, type ReactNode } from 'react'
 // Converter's PanelParts — two suite apps that both ask "how hard should I
 // squeeze?" should not answer with two different-looking controls.
 
+/**
+ * One engine's settings — shut, by default.
+ *
+ * ⚠️ **Closed is the important part** (owner ask, 2026-08-29: "cleaner and
+ * simpler to understand for a newbie"). Everything in here is already answered:
+ * every kind defaults to Balanced, and the `summary` line says so along with the
+ * size that will produce. Somebody who dropped a photo to make it smaller can
+ * read one line per file type and press the button; the strength picker is
+ * there for the minority who want to argue with it.
+ *
+ * The summary is what makes closing this honest rather than merely tidy. A
+ * disclosure that hides what it is set to is a disclosure that applies settings
+ * invisibly — the same rule `Collapsible` below already follows for Advanced.
+ */
 export function Panel({
   title,
   count,
+  summary,
+  open,
+  onToggle,
   children,
 }: {
   title: string
   count: string
+  summary?: ReactNode
+  open: boolean
+  onToggle: () => void
   children: ReactNode
 }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white">
-      <div className="flex items-center gap-2.5 border-b border-slate-200 px-4 py-3">
-        <span className="text-[12.5px] font-bold text-slate-900">{title}</span>
-        <span className="ml-auto font-mono text-[11px] text-slate-400">{count}</span>
-      </div>
-      <div className="flex flex-col gap-4 p-4">{children}</div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        className={`group flex w-full items-center gap-2.5 px-4 py-3 text-left focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-orange-600 ${
+          open ? 'border-b border-slate-200' : ''
+        }`}
+      >
+        <span className="min-w-0">
+          <span className="block text-[12.5px] font-bold text-slate-900">{title}</span>
+          {!open && summary && (
+            <span className="mt-0.5 block text-[11px] leading-tight text-slate-500">{summary}</span>
+          )}
+        </span>
+        <span className="ml-auto flex shrink-0 items-center gap-2">
+          <span className="font-mono text-[11px] text-slate-400">{count}</span>
+          <svg
+            viewBox="0 0 12 12"
+            aria-hidden="true"
+            className={`h-3 w-3 text-slate-400 transition-transform group-hover:text-slate-600 ${open ? 'rotate-180' : ''}`}
+          >
+            <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </button>
+      {open && <div className="flex flex-col gap-4 p-4">{children}</div>}
     </div>
   )
 }

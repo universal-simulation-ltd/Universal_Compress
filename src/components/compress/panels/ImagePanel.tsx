@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useCompressStore } from '../../../stores/compressStore'
 import { LEVELS, LEVEL_BLURB, type ImageFormat, type MaxEdge } from '../../../lib/types'
 import { Blurb, Collapsible, Field, Hint, LevelPicker, Panel, Segmented, Select } from '../PanelParts'
@@ -31,10 +32,13 @@ export default function ImagePanel({ count }: { count: string }) {
     settings.maxEdge === 'source' ? 'original size' : `${settings.maxEdge} px`,
   ].join(' · ')
 
-  const { sub, note } = useLevelSizes('image')
+  // Shut by default — see `Panel`. The estimate for the other two levels is
+  // only worth paying for once somebody has opened it.
+  const [open, setOpen] = useState(false)
+  const { sub, note, summary } = useLevelSizes('image', open)
 
   return (
-    <Panel title="Images" count={count}>
+    <Panel title="Images" count={count} summary={summary} open={open} onToggle={() => setOpen((o) => !o)}>
       <Field label="How hard to squeeze">
         <LevelPicker
           options={LEVELS}

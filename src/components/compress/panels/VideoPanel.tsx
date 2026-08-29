@@ -55,10 +55,13 @@ export default function VideoPanel({ count }: { count: string }) {
   advanced.push(QUALITIES.find((q) => q.value === settings.quality)?.label ?? '')
   if (!settings.keepAudio) advanced.push('Silent')
 
-  const { sub, note } = useLevelSizes('video')
+  // Shut by default — see `Panel`. The estimate for the other two levels is
+  // only worth paying for once somebody has opened it.
+  const [open, setOpen] = useState(false)
+  const { sub, note, summary } = useLevelSizes('video', open)
 
   return (
-    <Panel title="Video" count={count}>
+    <Panel title="Video" count={count} summary={summary} open={open} onToggle={() => setOpen((o) => !o)}>
       <Field label="How hard to squeeze">
         <LevelPicker
           options={LEVELS}

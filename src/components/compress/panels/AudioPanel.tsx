@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useCompressStore } from '../../../stores/compressStore'
 import { LEVELS, LEVEL_BLURB, type AudioFormat } from '../../../lib/types'
 import { Blurb, Collapsible, Field, Hint, LevelPicker, Panel, Segmented, Toggle } from '../PanelParts'
@@ -27,10 +28,13 @@ export default function AudioPanel({ count }: { count: string }) {
     settings.mono ? 'mono' : 'stereo',
   ].join(' · ')
 
-  const { sub, note } = useLevelSizes('audio')
+  // Shut by default — see `Panel`. The estimate for the other two levels is
+  // only worth paying for once somebody has opened it.
+  const [open, setOpen] = useState(false)
+  const { sub, note, summary } = useLevelSizes('audio', open)
 
   return (
-    <Panel title="Audio" count={count}>
+    <Panel title="Audio" count={count} summary={summary} open={open} onToggle={() => setOpen((o) => !o)}>
       <Field label="How hard to squeeze">
         <LevelPicker
           options={LEVELS}
