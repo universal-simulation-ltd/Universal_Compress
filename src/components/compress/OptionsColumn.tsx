@@ -173,8 +173,12 @@ export function ActionCard() {
               : `${t.done} ready so far`}
         </span>
         <span className="ml-auto font-mono text-[11px] tabular-nums text-slate-400">
+          {/* The before/after pair used to live here, in 11px grey, and the
+              number people actually came for — what the file is NOW — was the
+              smaller half of it. It has its own block below; this is back to
+              being a count. */}
           {t.done > 0
-            ? `${formatBytes(t.bytesInDone)} → ${formatBytes(t.bytesOutDone)}`
+            ? `${t.done} file${t.done === 1 ? '' : 's'}`
             : formatBytes(t.bytesIn)}
         </span>
       </div>
@@ -183,6 +187,39 @@ export function ActionCard() {
         {/* Whichever is the thing to do next gets the orange. Once anything has
             finished that is the download — the compressing is behind you and
             the file is the reason you came. */}
+        {/* The answer, in the size it deserves.
+            "How big is it now?" is the one question this card exists to
+            answer, and it was a fragment of an 11px mono line in the header
+            (owner ask, 2026-08-29). The new size leads; what it WAS and what
+            that saved are the supporting line under it, because they only mean
+            anything relative to it. */}
+        {t.done > 0 && (
+          <div className="rounded-lg bg-white/70 px-3 py-2.5 ring-1 ring-orange-200/70">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-slate-500">
+                {allDone ? 'New size' : 'So far'}
+              </span>
+              {saved >= 1 && (
+                <span className="rounded-full bg-[#2F9E57]/12 px-2 py-0.5 text-[11px] font-bold text-[#166534]">
+                  −{saved}%
+                </span>
+              )}
+            </div>
+            <div className="mt-1 text-[26px] font-bold leading-none tabular-nums text-slate-900">
+              {formatBytes(t.bytesOutDone)}
+            </div>
+            <div className="mt-1.5 text-[11px] leading-snug text-slate-500">
+              {saved >= 1 ? (
+                <>
+                  was <span className="tabular-nums line-through decoration-slate-400">{formatBytes(t.bytesInDone)}</span>
+                </>
+              ) : (
+                'unchanged — these were already about as small as they go'
+              )}
+            </div>
+          </div>
+        )}
+
         {t.done > 0 ? (
           <>
             <button type="button" disabled={running} onClick={() => void downloadAll()} className={primary}>
@@ -208,12 +245,10 @@ export function ActionCard() {
           </button>
         )}
 
+        {/* The saving used to be stated here as well; it is in the block
+            above now, next to the number it is a saving ON. */}
         <p className="text-center text-[10.5px] text-slate-500">
-          {t.done === 0
-            ? 'Compressed files go straight to your downloads. Nothing is uploaded.'
-            : saved >= 1
-              ? `${saved}% smaller than what you dropped.`
-              : 'These were already about as small as they go.'}
+          Compressed files go straight to your downloads. Nothing is uploaded.
         </p>
       </div>
     </div>
