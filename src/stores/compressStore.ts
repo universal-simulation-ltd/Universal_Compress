@@ -19,6 +19,7 @@ import {
   type ImageSettings,
   type Level,
   type PdfSettings,
+  type ProbeMeta,
   type VideoCompressSettings,
 } from '../lib/types'
 
@@ -34,6 +35,8 @@ export interface Item {
   progress: number
   /** "1920 × 1080", "12 pages", "3:42" — filled in asynchronously after the drop. */
   detail?: string
+  /** The same header read, as numbers, for the size estimate. See `fillDetail`. */
+  meta?: ProbeMeta
   result?: { blob: Blob; name: string }
   error?: string
   /**
@@ -66,6 +69,7 @@ interface CompressState {
   updateAudio(patch: Partial<AudioSettings>): void
 
   compressAll(): Promise<void>
+  requeueAll(): void
   downloadItem(id: string): void
   downloadAll(): Promise<void>
 }
@@ -209,6 +213,25 @@ export const useCompressStore = create<CompressState>((set, get) => ({
     }
   },
 
+  /**
+   * Put everything back in the queue so it can be compressed again.
+   *
+   * This exists because the settings are now worth changing AFTER a run: each
+   * level shows the size it would produce, so "Balanced was 4 MB, let me see
+   * Maximum" is a thing somebody will actually do. Results are cleared rather
+   * than kept beside the new ones — two versions of the same file with no way
+   * to tell which download is which is worse than losing the first.
+   */
+  requeueAll() {
+    set((s) => ({
+      items: s.items.map((i) =>
+        i.kind === 'unsupported'
+          ? i
+          : { ...i, status: 'queued' as const, progress: 0, result: undefined, error: undefined, keptOriginal: undefined },
+      ),
+    }))
+  },
+
   downloadItem(id) {
     const item = get().items.find((i) => i.id === id)
     if (!item?.result) return
@@ -231,29 +254,61 @@ function patch(set: Setter, id: string, changes: Partial<Item>) {
   set((s) => ({ items: s.items.map((i) => (i.id === id ? { ...i, ...changes } : i)) }))
 }
 
+/**
+ * Read what the header says, once, in the background.
+ *
+ * This fills TWO things from one read, which is why the probes return numbers
+ * rather than the strings they used to: `detail` is the sentence on the file
+ * row, and `meta` is the same fact in the shape the size estimate needs. A
+ * second pass to re-read a duration the row already displayed would be a decode
+ * per file for a number we had and threw away.
+ */
 async function fillDetail(item: Item, set: Setter) {
-  let detail: string | null = null
   switch (item.kind) {
-    case 'image':
-      detail = await probeDimensions(item.file)
-      break
+    case 'image': {
+      const size = await probeDimensions(item.file)
+      if (!size) return
+      return patch(set, item.id, {
+        detail: `${size.width} × ${size.height}`,
+        meta: { kind: 'image', width: size.width, height: size.height },
+      })
+    }
     case 'pdf': {
       // Dynamic for the same reason the compressor is — see compress/index.ts.
       // Dropping a PDF is the moment it becomes worth a megabyte of pdf-lib.
       const { probePageCount } = await import('../lib/compress/pdf')
-      detail = await probePageCount(item.file)
-      break
+      const pages = await probePageCount(item.file)
+      if (pages === null) return
+      return patch(set, item.id, {
+        detail: pages === 1 ? '1 page' : `${pages} pages`,
+        meta: { kind: 'pdf', pages },
+      })
     }
-    case 'video':
-      detail = await probeVideo(item.file)
-      break
-    case 'audio':
-      detail = await probeDuration(item.file)
-      break
+    case 'video': {
+      const probe = await probeVideo(item.file)
+      if (!probe) return
+      return patch(set, item.id, {
+        detail: `${probe.width} × ${probe.height} · ${clock(probe.duration)}`,
+        meta: { kind: 'video', probe },
+      })
+    }
+    case 'audio': {
+      const seconds = await probeDuration(item.file)
+      if (seconds === null) return
+      return patch(set, item.id, {
+        detail: clock(seconds),
+        meta: { kind: 'audio', seconds },
+      })
+    }
     default:
       return
   }
-  if (detail) patch(set, item.id, { detail })
+}
+
+/** Seconds as "3:42". */
+function clock(seconds: number): string {
+  const total = Math.round(seconds)
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
 
 // ── Derived views ────────────────────────────────────────────────────────────

@@ -1,11 +1,14 @@
 import { useCompressStore } from '../../../stores/compressStore'
 import { LEVELS, LEVEL_BLURB } from '../../../lib/types'
 import { Blurb, Field, LevelPicker, Panel } from '../PanelParts'
+import { useLevelSizes } from '../LevelSizes'
 
 export default function PdfPanel({ count }: { count: string }) {
   const level = useCompressStore((s) => s.pdf.level)
   const running = useCompressStore((s) => s.running)
   const setLevel = useCompressStore((s) => s.setLevel)
+
+  const { sub, note } = useLevelSizes('pdf')
 
   return (
     <Panel title="PDF" count={count}>
@@ -15,8 +18,10 @@ export default function PdfPanel({ count }: { count: string }) {
           value={level}
           disabled={running}
           onChange={(next) => setLevel('pdf', next)}
+          sub={sub}
         />
         <Blurb>{LEVEL_BLURB.pdf[level]}</Blurb>
+        {note}
       </Field>
 
       {/* No Advanced section here, and that is deliberate. A PDF has exactly one

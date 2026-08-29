@@ -4,6 +4,7 @@ import { videoSupported } from '../../../lib/compress/video'
 import { useCompressStore } from '../../../stores/compressStore'
 import { LEVELS, LEVEL_BLURB } from '../../../lib/types'
 import { Blurb, Collapsible, Divider, Field, Hint, LevelPicker, Panel, Segmented, Select, Toggle } from '../PanelParts'
+import { useLevelSizes } from '../LevelSizes'
 
 const HEIGHTS: { value: MaxHeight; label: string }[] = [
   { value: 'source', label: 'Keep the original size' },
@@ -54,6 +55,8 @@ export default function VideoPanel({ count }: { count: string }) {
   advanced.push(QUALITIES.find((q) => q.value === settings.quality)?.label ?? '')
   if (!settings.keepAudio) advanced.push('Silent')
 
+  const { sub, note } = useLevelSizes('video')
+
   return (
     <Panel title="Video" count={count}>
       <Field label="How hard to squeeze">
@@ -62,8 +65,10 @@ export default function VideoPanel({ count }: { count: string }) {
           value={settings.level}
           disabled={running}
           onChange={(next) => setLevel('video', next)}
+          sub={sub}
         />
         <Blurb>{LEVEL_BLURB.video[settings.level]}</Blurb>
+        {note}
       </Field>
 
       {supported === false && (

@@ -114,36 +114,61 @@ export function Segmented<T extends string | number>({
  * The strength control. Bigger and warmer than `Segmented` because it is the one
  * control most people will ever touch — the rest of the panel exists to be
  * ignored.
+ *
+ * Each button carries the size it would produce (`sub`), because until there is
+ * a number beside them "Balanced" and "Maximum" are adjectives — the choice they
+ * are asking about is one nobody can make by reading the words. A level with
+ * nothing honest to say shows a blank line rather than a placeholder, and the
+ * line is reserved either way so the three buttons never change height as the
+ * numbers arrive.
  */
 export function LevelPicker<T extends string>({
   options,
   value,
   disabled,
   onChange,
+  sub,
 }: {
   options: { value: T; label: string }[]
   value: T
   disabled: boolean
   onChange: (value: T) => void
+  sub?: (value: T) => string | null
 }) {
   return (
     <div className="grid grid-cols-3 gap-1.5">
-      {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
-          disabled={disabled}
-          aria-pressed={value === o.value}
-          onClick={() => onChange(o.value)}
-          className={`rounded-lg px-2 py-2 text-[12px] font-bold transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-50 ${
-            value === o.value
-              ? 'bg-gradient-to-br from-[#FE8C01] to-[#E05504] text-white shadow-sm'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          {o.label}
-        </button>
-      ))}
+      {options.map((o) => {
+        const active = value === o.value
+        const line = sub?.(o.value) ?? null
+        return (
+          <button
+            key={o.value}
+            type="button"
+            disabled={disabled}
+            aria-pressed={active}
+            onClick={() => onChange(o.value)}
+            className={`rounded-lg px-2 py-2 text-[12px] font-bold transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-50 ${
+              active
+                ? 'bg-gradient-to-br from-[#FE8C01] to-[#E05504] text-white shadow-sm'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <span className="block">{o.label}</span>
+            {sub && (
+              <span
+                className={`mt-0.5 block text-[10px] font-semibold tabular-nums ${
+                  active ? 'text-white/85' : 'text-slate-500'
+                }`}
+              >
+                {/* A non-breaking space, not an empty string: the line has to
+                    occupy its height before the first estimate lands, or every
+                    panel jumps when it does. */}
+                {line ?? ' '}
+              </span>
+            )}
+          </button>
+        )
+      })}
     </div>
   )
 }

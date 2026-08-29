@@ -1,6 +1,7 @@
 import { useCompressStore } from '../../../stores/compressStore'
 import { LEVELS, LEVEL_BLURB, type ImageFormat, type MaxEdge } from '../../../lib/types'
 import { Blurb, Collapsible, Field, Hint, LevelPicker, Panel, Segmented, Select } from '../PanelParts'
+import { useLevelSizes } from '../LevelSizes'
 
 const FORMATS: { value: ImageFormat; label: string }[] = [
   { value: 'keep', label: 'Automatic' },
@@ -30,6 +31,8 @@ export default function ImagePanel({ count }: { count: string }) {
     settings.maxEdge === 'source' ? 'original size' : `${settings.maxEdge} px`,
   ].join(' · ')
 
+  const { sub, note } = useLevelSizes('image')
+
   return (
     <Panel title="Images" count={count}>
       <Field label="How hard to squeeze">
@@ -38,8 +41,10 @@ export default function ImagePanel({ count }: { count: string }) {
           value={settings.level}
           disabled={running}
           onChange={(next) => setLevel('image', next)}
+          sub={sub}
         />
         <Blurb>{LEVEL_BLURB.image[settings.level]}</Blurb>
+        {note}
       </Field>
 
       <Collapsible label="Advanced" summary={advanced}>

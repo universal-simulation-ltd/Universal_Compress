@@ -1,6 +1,7 @@
 import { useCompressStore } from '../../../stores/compressStore'
 import { LEVELS, LEVEL_BLURB, type AudioFormat } from '../../../lib/types'
 import { Blurb, Collapsible, Field, Hint, LevelPicker, Panel, Segmented, Toggle } from '../PanelParts'
+import { useLevelSizes } from '../LevelSizes'
 
 const FORMATS: { value: AudioFormat; label: string }[] = [
   { value: 'mp3', label: 'MP3' },
@@ -26,6 +27,8 @@ export default function AudioPanel({ count }: { count: string }) {
     settings.mono ? 'mono' : 'stereo',
   ].join(' · ')
 
+  const { sub, note } = useLevelSizes('audio')
+
   return (
     <Panel title="Audio" count={count}>
       <Field label="How hard to squeeze">
@@ -34,8 +37,10 @@ export default function AudioPanel({ count }: { count: string }) {
           value={settings.level}
           disabled={running}
           onChange={(next) => setLevel('audio', next)}
+          sub={sub}
         />
         <Blurb>{LEVEL_BLURB.audio[settings.level]}</Blurb>
+        {note}
       </Field>
 
       <Collapsible label="Advanced" summary={advanced}>

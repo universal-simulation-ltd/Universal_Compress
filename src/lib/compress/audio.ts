@@ -75,13 +75,20 @@ async function render(decoded: AudioBuffer, settings: AudioSettings): Promise<Au
   return ctx.startRendering()
 }
 
-/** "3:42 · stereo" for the file row. Costs a decode, so it is not run on drop. */
-export function probeDuration(file: File): Promise<string | null> {
+/**
+ * Duration in seconds, from the header alone.
+ *
+ * Returns the number rather than the "3:42" string it used to. The row still
+ * shows the string, but a bitrate is bytes per SECOND, so the size estimate
+ * needs the number — and for CBR audio `bitrate x seconds` is not an
+ * approximation, it is the arithmetic the encoder itself performs.
+ */
+export function probeDuration(file: File): Promise<number | null> {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file)
     const audio = new Audio()
     let settled = false
-    const finish = (value: string | null) => {
+    const finish = (value: number | null) => {
       if (settled) return
       settled = true
       clearTimeout(timer)
@@ -90,11 +97,8 @@ export function probeDuration(file: File): Promise<string | null> {
     }
     const timer = setTimeout(() => finish(null), 5000)
     audio.onloadedmetadata = () => {
-      const total = Math.round(audio.duration)
-      if (!Number.isFinite(total)) return finish(null)
-      const mins = Math.floor(total / 60)
-      const secs = total % 60
-      finish(`${mins}:${String(secs).padStart(2, '0')}`)
+      if (!Number.isFinite(audio.duration)) return finish(null)
+      finish(audio.duration)
     }
     audio.onerror = () => finish(null)
     audio.src = url

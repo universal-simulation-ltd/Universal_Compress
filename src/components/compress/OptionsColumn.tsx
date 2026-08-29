@@ -1,3 +1,4 @@
+import { formatBytes, savingPercent } from '../../lib/layout'
 import { kindLabel } from '../../lib/kinds'
 import { useCompressStore, kindsPresent, totals } from '../../stores/compressStore'
 import PdfPanel from './panels/PdfPanel'
@@ -23,6 +24,8 @@ export default function OptionsColumn() {
 
   return (
     <div className="flex flex-col gap-4">
+      <ReadyCard />
+
       {kinds.map((kind) => {
         const count = kindLabel(kind, items.filter((i) => i.kind === kind).length)
         switch (kind) {
@@ -98,60 +101,106 @@ function Capability({ label, body }: { label: string; body: string }) {
 }
 
 /**
- * The one button. It always says what happens next, and what happens next
- * depends only on the state of the queue — so there is never a moment with two
- * plausible primary actions on screen.
+ * The button under the circle. One job: run the queue.
+ *
+ * ⚠️ **It used to morph into the download when the run finished**, on the rule
+ * that there is never a moment with two plausible primary actions on screen.
+ * The download now lives in the settings column instead (owner ask, 2026-08-29
+ * — see `ReadyCard`), and the rule it broke is paid for rather than ignored:
+ * this button is never a download, so the two actions are never in the same
+ * place at different times, and when the queue is empty it offers the one thing
+ * that IS worth doing again — another run at a different strength, which is a
+ * real choice now that each level shows the size it would produce.
  */
 export function PrimaryAction() {
   const items = useCompressStore((s) => s.items)
   const running = useCompressStore((s) => s.running)
   const compressAll = useCompressStore((s) => s.compressAll)
-  const downloadAll = useCompressStore((s) => s.downloadAll)
+  const requeueAll = useCompressStore((s) => s.requeueAll)
 
   const t = totals(items)
   if (t.eligible === 0) return null
 
-  const allDone = t.pending === 0 && t.done > 0
+  // ⚠️ `t.done === t.eligible`, NOT `t.pending === 0`. `pending` counts what is
+  // QUEUED — the file currently being compressed is in neither count — so
+  // halfway through a two-file run `pending === 0 && done > 0` is true and this
+  // button announced "Compress again" over a run that was still going.
+  const nothingLeft = t.done === t.eligible && t.done > 0
 
   return (
     <div className="flex w-full max-w-[340px] flex-col gap-2">
-      {allDone ? (
-        <button
-          type="button"
-          onClick={() => void downloadAll()}
-          className="w-full rounded-xl bg-gradient-to-br from-[#FE8C01] to-[#E05504] px-4 py-3 text-[14px] font-bold text-white shadow-sm transition-opacity hover:opacity-95 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
-        >
-          {t.done === 1 ? 'Download the compressed file' : `Download all ${t.done} files as a ZIP`}
-        </button>
-      ) : (
-        <button
-          type="button"
-          disabled={running || t.pending === 0}
-          onClick={() => void compressAll()}
-          className="w-full rounded-xl bg-gradient-to-br from-[#FE8C01] to-[#E05504] px-4 py-3 text-[14px] font-bold text-white shadow-sm transition-opacity hover:opacity-95 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {running
-            ? 'Compressing…'
+      <button
+        type="button"
+        disabled={running || (t.pending === 0 && t.done === 0)}
+        onClick={() => (nothingLeft ? requeueAll() : void compressAll())}
+        className="w-full rounded-xl bg-gradient-to-br from-[#FE8C01] to-[#E05504] px-4 py-3 text-[14px] font-bold text-white shadow-sm transition-opacity hover:opacity-95 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {running
+          ? 'Compressing…'
+          : nothingLeft
+            ? 'Compress again'
             : t.pending === 1
               ? 'Compress 1 file'
               : `Compress ${t.pending} files`}
-        </button>
-      )}
+      </button>
 
-      {t.done > 0 && !allDone && (
+      <p className="text-center text-[10.5px] text-slate-400">
+        {nothingLeft
+          ? 'Change a strength above and run it again — nothing is uploaded.'
+          : 'Compressed files go straight to your downloads. Nothing is uploaded.'}
+      </p>
+    </div>
+  )
+}
+
+/**
+ * The download, at the TOP of the settings column.
+ *
+ * Top rather than bottom for one reason, and it is the phone: below `lg` the
+ * two columns stack as circle, button, list, settings — so a download card at
+ * the foot of the column would sit under every panel, and finishing a run would
+ * mean scrolling past the settings you already made to reach the file you came
+ * for. At the top it lands directly after the list on a phone and directly
+ * beside the finished rows on a desktop.
+ *
+ * It only exists once something has finished, so nothing is pushed down until
+ * there is a reason to push it.
+ */
+function ReadyCard() {
+  const items = useCompressStore((s) => s.items)
+  const running = useCompressStore((s) => s.running)
+  const downloadAll = useCompressStore((s) => s.downloadAll)
+
+  const t = totals(items)
+  if (t.done === 0) return null
+
+  const saved = savingPercent(t.bytesInDone, t.bytesOutDone)
+
+  return (
+    <div className="rounded-xl border border-orange-200 bg-orange-50/60">
+      <div className="flex items-center gap-2.5 border-b border-orange-200/70 px-4 py-3">
+        <span className="text-[12.5px] font-bold text-slate-900">
+          {t.done === t.eligible ? 'Ready to download' : `${t.done} ready so far`}
+        </span>
+        <span className="ml-auto font-mono text-[11px] text-slate-500 tabular-nums">
+          {formatBytes(t.bytesInDone)} → {formatBytes(t.bytesOutDone)}
+        </span>
+      </div>
+      <div className="flex flex-col gap-2 p-4">
         <button
           type="button"
           disabled={running}
           onClick={() => void downloadAll()}
-          className="w-full rounded-xl bg-orange-500/12 px-4 py-2.5 text-[13px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:opacity-40"
+          className="w-full rounded-xl bg-gradient-to-br from-[#FE8C01] to-[#E05504] px-4 py-3 text-[14px] font-bold text-white shadow-sm transition-opacity hover:opacity-95 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Download the {t.done} finished so far
+          {t.done === 1 ? 'Download the compressed file' : `Download all ${t.done} files as a ZIP`}
         </button>
-      )}
-
-      <p className="text-center text-[10.5px] text-slate-400">
-        Compressed files go straight to your downloads. Nothing is uploaded.
-      </p>
+        <p className="text-center text-[10.5px] text-slate-500">
+          {saved >= 1
+            ? `${saved}% smaller than what you dropped.`
+            : 'These were already about as small as they go.'}
+        </p>
+      </div>
     </div>
   )
 }

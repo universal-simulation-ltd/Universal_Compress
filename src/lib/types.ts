@@ -1,4 +1,4 @@
-import type { MaxHeight, VideoQuality } from '@unisim/media'
+import type { MaxHeight, VideoProbe, VideoQuality } from '@unisim/media'
 import type { FileKind } from './kinds'
 
 /**
@@ -165,3 +165,17 @@ export interface CompressedFile {
   blob: Blob
   name: string
 }
+
+// ── What the header said, as numbers ─────────────────────────────────────────
+
+/**
+ * The probe result for one dropped file, kept alongside the sentence shown on
+ * its row. The size estimate needs the numbers — a bitrate is bytes per second,
+ * a rasterised PDF is bytes per page — and re-reading them later would mean a
+ * second decode per file for a fact already in hand. See `fillDetail`.
+ */
+export type ProbeMeta =
+  | { kind: 'image'; width: number; height: number }
+  | { kind: 'video'; probe: VideoProbe }
+  | { kind: 'audio'; seconds: number }
+  | { kind: 'pdf'; pages: number }
