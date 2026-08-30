@@ -207,3 +207,36 @@ body {
     animation: none !important;
   }
 }
+
+/* ── iOS: don't let a tap on a field zoom the page ───────────────────────────
+   Safari and WKWebView magnify the whole page whenever a field is focused whose
+   computed font-size is under 16px — and there is no matching zoom back out, so
+   the page is simply left magnified for the rest of the session. Flooring the
+   font size at 16px is the only fix that doesn't take something away from the
+   user.
+
+   ⚠️ Do NOT "fix" this with `maximum-scale=1` / `user-scalable=no` on the
+   viewport meta. That stops the zoom by disabling pinch-zoom for everybody,
+   which is an accessibility regression, not a fix — the meta tag stays
+   `width=device-width, initial-scale=1.0, viewport-fit=cover`.
+
+   Scoped to coarse pointers so the desktop type scale is untouched: a global
+   16px minimum visibly fattens every form on a mouse-driven screen, and the
+   zoom only ever happens on touch.
+
+   `max(16px, 1em)` is a floor, not a size — anything already larger keeps the
+   size it inherits. `!important` is deliberate: the floor has to beat a
+   `text-sm` utility (or a `font: inherit`) sitting directly on the element, and
+   this is a platform constraint rather than a design preference.
+
+   Controls that never take a caret are excluded — they don't trigger the zoom,
+   and some of them size their own chrome off font-size.
+
+   The same block is in Universal_QR, Universal_Compress and Universal_AI. */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']):not([type='file']):not([type='button']):not([type='submit']):not([type='reset']),
+  textarea,
+  select {
+    font-size: max(16px, 1em) !important;
+  }
+}
