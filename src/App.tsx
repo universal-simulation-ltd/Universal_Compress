@@ -9,7 +9,14 @@ const REPO_URL = 'https://github.com/universal-simulation-ltd/Universal_Compress
 
 export default function App() {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-100">
+    // ⚠️ pt-[env(safe-area-inset-top)] is for the native (Capacitor) build, not
+    // the web one. Capacitor runs the app in a FULL-SCREEN WKWebView, and
+    // index.html asks for `viewport-fit=cover`, so without this the navbar
+    // renders UNDERNEATH the status bar and Dynamic Island, which puts the
+    // product name on the clock and the menu out of reach. In a browser the
+    // inset is 0, so this is a no-op on web and on desktop. Universal PDF, QR
+    // and Images all carry the same line.
+    <div className="flex min-h-screen flex-col bg-slate-100 pt-[env(safe-area-inset-top)]">
       <UniversalAppsNavBar
         product="compress"
         productLogo={<ProductLogo />}
