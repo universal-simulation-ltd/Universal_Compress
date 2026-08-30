@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Universal Compress</string>
+    <string name="title_activity_main">Universal Compress</string>
+    <string name="package_name">uk.co.unisim.compress</string>
+    <string name="custom_url_scheme">uk.co.unisim.compress</string>
+</resources>
