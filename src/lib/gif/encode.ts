@@ -1,28 +1,34 @@
 /**
  * GIF89a — the palette builder, the quantiser and the LZW coder.
  *
- * ⚠️ **A FORK of Universal Converter's `src/lib/gif.ts`, not a copy.** The
- * original was written to turn *video* into a GIF, and video frames are opaque
- * — so alpha is ignored throughout it and index 255 is spent entirely on frame
- * differencing. Compressing a GIF means the source may have had transparency of
- * its own, which is three real changes, all marked `FORK:` below:
+ * ⚠️ **THIS FILE IS SHARED VERBATIM BY TWO REPOS. Keep it that way.**
+ * `Universal_Compress/src/lib/gif/encode.ts` and
+ * `Universal_Converter/src/lib/gif.ts` are byte-identical copies. It began in
+ * the converter, written to turn *video* into a GIF; Universal Compress needed
+ * the same writer for GIFs that already existed, which meant handling source
+ * transparency that opaque video frames never have. Rather than fork, the
+ * converter took the additions — they are inert on opaque input.
+ *
+ * The three transparency-aware parts, since they are the ones that look
+ * optional and are not:
  *
  *   1. `ColourCube` skips transparent pixels, so a sticker on a transparent
  *      ground does not spend a quarter of its palette on the black behind it.
  *   2. `quantiseFrame` maps a transparent pixel to `TRANSPARENT_INDEX` instead
  *      of to whatever colour is nearest to its meaningless RGB.
- *   3. `GifWriter` gained a second mode. Differencing writes disposal 1, "do
- *      not dispose", which can add pixels to the screen but can never take one
+ *   3. `GifWriter` has two modes. Differencing writes disposal 1, "do not
+ *      dispose", which can add pixels to the screen but can never take one
  *      away — so an animation where something transparent *moves* has to be
  *      written as full frames with disposal 2. See the mode note on the class.
  *
- * If either file grows a fourth divergence it is time to lift this into
- * `@unisim/media` rather than fork it again — noted in the backlog.
+ * Copy any change to the other repo in the same session. When a third consumer
+ * appears, or the copies ever have to differ, lift the pair (this and
+ * `decode.ts`) into `@unisim/media` instead — noted in the backlog.
  *
- * A leaf module with no imports, so scripts/gif-selftest.mjs can drive it in
- * Node with no DOM and check the bytes against a real third-party reader
- * (ffmpeg). The reading half — turning a dropped .gif back into frames to feed
- * it — is `decode.ts`, which this file knows nothing about.
+ * A leaf module with no imports, so the self-test can drive it in Node with no
+ * DOM and check the bytes against a real third-party reader (ffmpeg). The
+ * reading half — turning a .gif back into frames to feed it — is its twin
+ * `decode.ts`, which this file knows nothing about.
  *
  * Why write one at all, when the browser encodes PNG, JPEG, WebP and AVIF for
  * us? Because `canvas.toBlob('image/gif')` does not exist in any engine, and
@@ -67,7 +73,7 @@ export const TRANSPARENT_INDEX = 255
 export const MAX_COLOURS = 255
 
 /**
- * FORK: at or above this alpha a pixel is drawn; below it, it is transparent.
+ * At or above this alpha a pixel is drawn; below it, it is transparent.
  *
  * GIF has no partial transparency — a pixel is either a palette entry or it is
  * not there — so a threshold is not a simplification, it is the only thing the
@@ -78,7 +84,7 @@ export const MAX_COLOURS = 255
  */
 export const ALPHA_THRESHOLD = 128
 
-/** FORK: how frames relate to one another. See the note on `GifWriter`. */
+/** How frames relate to one another. See the note on `GifWriter`. */
 export type GifMode = 'diff' | 'full'
 
 // ── Choosing the colours ─────────────────────────────────────────────────────
@@ -101,7 +107,7 @@ export class ColourCube {
   /**
    * Add every pixel of one RGBA frame.
    *
-   * FORK: transparent pixels are left out of the histogram entirely. They have
+   * Transparent pixels are left out of the histogram entirely. They have
    * an RGB — usually black, sometimes whatever the tool that wrote the file
    * left in the buffer — and it is a colour nobody will ever see. Counting it
    * would let a logo with a large transparent ground push real colours out of a
@@ -309,7 +315,7 @@ export class PaletteMap {
  * frame differencing below and can double or triple the file. Gradients get it
  * turned on deliberately.
  *
- * FORK: a pixel below `ALPHA_THRESHOLD` becomes `TRANSPARENT_INDEX` rather than
+ * A pixel below `ALPHA_THRESHOLD` becomes `TRANSPARENT_INDEX` rather than
  * the nearest colour to its invisible RGB. In the dithered path it also stops
  * the error there instead of spreading it — carrying the difference between a
  * transparent pixel and the colour it "should" have been into its neighbours
@@ -396,7 +402,7 @@ function clamp255(value: number): number {
  * that plays correctly in the browser that wrote it and smears in everything
  * else — the classic GIF failure, and not one a caller should be able to reach.
  *
- * ── FORK: the two modes ─────────────────────────────────────────────────────
+ * ── The two modes ──────────────────────────────────────────────────────────
  *
  * **`'diff'`** is the original behaviour and what almost every animation gets:
  * disposal method 1, "do not dispose", each frame sending only the rectangle
@@ -415,15 +421,15 @@ function clamp255(value: number): number {
  * disposal method 2, "restore to background", which clears the canvas before
  * the next one. Nothing is inherited, so nothing can fail to be erased. It
  * costs real bytes — there is no differencing left to do — which is why
- * `compress/gif.ts` decides between them by looking at whether the source
- * animation ever actually erases anything, rather than by playing safe.
+ * the caller decides between them by looking at whether the source animation
+ * ever actually erases anything, rather than by playing safe.
  */
 export class GifWriter {
   private readonly chunks: Uint8Array[] = []
   private previous: Uint8Array | null = null
   readonly width: number
   readonly height: number
-  /** FORK: see the two-modes note above. */
+  /** See the two-modes note above. */
   private readonly mode: GifMode
 
   // ⚠️ `width` and `height` are assigned in the body rather than declared as
@@ -466,7 +472,7 @@ export class GifWriter {
     // NETSCAPE2.0, loop count 0 = forever. Leaving this out is what makes a
     // GIF play once, so it is a genuine choice rather than boilerplate.
     //
-    // FORK: a COUNT is accepted as well as a flag, because re-encoding an
+    // A COUNT is accepted as well as a flag, because re-encoding an
     // existing GIF has an answer to carry across rather than a default to pick.
     // ⚠️ Tested against `false`, never for truthiness — `0` is a legal count
     // and the one that means "forever", which is the commonest value there is.
@@ -494,7 +500,7 @@ export class GifWriter {
     }
     const delay = Math.max(2, Math.min(65535, Math.round(delayCs)))
 
-    // FORK: full frames, disposal 2. No previous frame is consulted and none is
+    // Full frames, disposal 2. No previous frame is consulted and none is
     // kept, because nothing survives to the next frame to diff against.
     if (this.mode === 'full') {
       this.writeFrame(0, 0, this.width, this.height, indices, true, delay, DISPOSE_BACKGROUND)
@@ -502,7 +508,7 @@ export class GifWriter {
     }
 
     if (!this.previous) {
-      // FORK: `transparent` was hard-coded false here, which was right when the
+      // ⚠️ `transparent` was hard-coded false here, which was right when the
       // only transparency in the file was the differencing kind — the first
       // frame has nothing to difference against. A source GIF's own
       // transparency reaches the first frame too, and declaring no transparent

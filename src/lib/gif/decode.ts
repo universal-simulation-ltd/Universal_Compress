@@ -1,23 +1,30 @@
 /**
  * GIF87a/89a — the reader.
  *
- * The suite already had a GIF *writer* (Universal Converter's `src/lib/gif.ts`,
- * forked here as `encode.ts`) because no browser will encode one. It had no
- * reader, because until now nothing needed one: the converter only ever wrote
- * GIFs, out of video frames it had decoded some other way.
+ * ⚠️ **THIS FILE IS SHARED VERBATIM BY TWO REPOS. Keep it that way.**
+ * `Universal_Compress/src/lib/gif/decode.ts` and
+ * `Universal_Converter/src/lib/gifdecode.ts` are byte-identical copies, as are
+ * its twin `encode.ts` / `gif.ts`. Copy any change to the other repo in the
+ * same session; when a third consumer appears, lift the pair into
+ * `@unisim/media` instead — noted in the backlog.
  *
- * Compressing a GIF needs the other half, and the browser cannot supply it
- * either. `createImageBitmap()` on an animated GIF hands back **frame one and
- * nothing else** — silently, with no flag to say an animation went in. That is
- * exactly how this app used to turn a 4.2 MB animation into a 2 KB still and
- * report it as "−100%". `<img>` animates but will not let you read the frames;
- * `ImageDecoder` can do it, but is absent from Safari, which is a third of the
- * traffic to a privacy-first web app. So: a reader.
+ * The suite had a GIF *writer* long before it had a reader, because until
+ * recently nothing needed one: the converter only ever wrote GIFs, out of video
+ * frames it had decoded some other way.
  *
- * A leaf module, like `encode.ts` — no imports, no DOM, nothing but bytes in
- * and pixels out. That is what lets `scripts/gif-selftest.mjs` run it under
- * Node's type stripping and check it against ffmpeg, which is the only way to
- * know a codec is right. "Our reader agrees with our writer" proves nothing.
+ * Doing anything to a GIF that already exists needs the other half, and the
+ * browser will not supply it. `createImageBitmap()` on an animated GIF hands
+ * back **frame one and nothing else** — silently, with no flag to say an
+ * animation went in. That is exactly how Universal Compress turned a 4.2 MB
+ * animation into a 2 KB still and reported it as "−100%", the biggest saving on
+ * the screen, for having destroyed the file. `<img>` animates but will not let
+ * you read the frames; `ImageDecoder` can do it, but is absent from Safari,
+ * which is a third of the traffic to a privacy-first web app. So: a reader.
+ *
+ * A leaf module, like its twin — no imports, no DOM, nothing but bytes in and
+ * pixels out. That is what lets the GIF self-test run it under Node's type
+ * stripping and check it against ffmpeg, which is the only way to know a codec
+ * is right. "Our reader agrees with our writer" proves nothing.
  */
 
 /** One decoded frame: the whole canvas, composited, not just this frame's rectangle. */
@@ -27,8 +34,8 @@ export interface GifFrame {
    *
    * ⚠️ **The same buffer comes back every frame.** Copy it if you intend to
    * keep it — a 500-frame 800×600 GIF is 960 MB of pixels if every frame is
-   * retained, which is a killed tab rather than a slow one. Both passes in
-   * `compress/gif.ts` consume each frame and let it go.
+   * retained, which is a killed tab rather than a slow one. Every caller in
+   * both apps consumes each frame and lets it go.
    */
   rgba: Uint8ClampedArray
   /** Hundredths of a second this frame is held. Already normalised — see `normaliseDelay`. */
