@@ -28,7 +28,11 @@ import type {
  *     are the same function.
  *   • **audio** — `bitrate x seconds`. CBR, so this is arithmetic, not a guess.
  *   • **images** — one file is REALLY ENCODED at the level and measured; the
- *     rest are scaled from it by output pixel count.
+ *     rest are scaled from it by output pixel count. Animated GIFs are sampled
+ *     and scaled **separately from stills**, because they are not the same job:
+ *     a GIF is a palette and an LZW coder over hundreds of frames, a JPEG is
+ *     one pass of a DCT, and pricing either from the other is a number that
+ *     would be wrong by a multiple.
  *   • **PDF** — the light repack is run (it is the cheap mode); the raster modes
  *     render two real pages and multiply. See `samplePdfBytes`.
  *
@@ -57,6 +61,27 @@ export interface LevelSettings {
  * pause that reads as a hang. No estimate is shown for these.
  */
 const PDF_SAMPLE_LIMIT_BYTES = 60 * 1024 * 1024
+
+/**
+ * The most decoding work an animated GIF's estimate will do, in source pixels —
+ * frames multiplied by frame size. The GIF twin of the limit above.
+ *
+ * ⚠️ This bounds the ESTIMATE, never the job. Pressing Compress on a huge GIF
+ * does the work however long it takes, with a progress bar; predicting its size
+ * beforehand means doing that same work, unasked, while somebody watches a
+ * spinner. Past this the panel shows nothing.
+ *
+ * 100 megapixels is about two seconds, measured rather than guessed: 20 ms per
+ * megapixel across the two real GIFs in `scripts/gif-selftest.mjs` — a
+ * 14-frame 1430x338 screen recording and a 300-frame 800x220 one.
+ *
+ * ⚠️ It lives HERE, not in `compress/gif.ts` where the cost is incurred, and
+ * that is deliberate: this module is in the main bundle, so importing anything
+ * from `compress/gif.ts` would pull the reader, the palette builder and the LZW
+ * coder in with it and undo the dynamic import in `compress/image.ts` that
+ * keeps them away from everyone who never drops a GIF.
+ */
+const GIF_ESTIMATE_LIMIT_PIXELS = 100_000_000
 
 export async function estimateKind(
   kind: FileKind,
@@ -124,18 +149,47 @@ function estimateAudio(items: EstimateItem[], settings: AudioSettings): number |
 /**
  * Encode one image for real, then scale the rest off it.
  *
- * The sample is the LARGEST source in the queue, and that choice is the whole
+ * The sample is the LARGEST source in its group, and that choice is the whole
  * accuracy argument: the biggest file dominates the total, so measuring it
  * exactly leaves the approximation only on the files that move the answer least.
  * Content still varies — a flat screenshot and a photograph do not cost the same
  * per pixel — which is why the number is shown as "≈".
+ *
+ * ⚠️ **Animated GIFs are their own group.** One sample for the whole queue was
+ * right while every image took the same canvas path; it stopped being right
+ * when GIFs got a codec of their own. A 300-frame GIF and a JPEG have no ratio
+ * in common, and whichever happened to be the largest file would have set the
+ * price for the other.
  */
 async function estimateImage(items: EstimateItem[], settings: ImageSettings): Promise<number | null> {
   const usable = items.filter((i) => i.meta?.kind === 'image')
   if (usable.length !== items.length) return null
 
-  const sample = usable.reduce((a, b) => (b.file.size > a.file.size ? b : a))
-  const sampleMeta = sample.meta as Extract<ProbeMeta, { kind: 'image' }>
+  const animated = usable.filter((i) => frameCount(i) > 1)
+  const stills = usable.filter((i) => frameCount(i) === 1)
+
+  // Sampling a GIF means decoding and re-encoding every frame of it — the whole
+  // job, done twice, before anyone has pressed anything. Past the budget the
+  // panel says nothing at all.
+  if (animated.length > 0) {
+    const biggest = largest(animated)
+    const meta = imageMeta(biggest)
+    if (meta.width * meta.height * frameCount(biggest) > GIF_ESTIMATE_LIMIT_PIXELS) return null
+  }
+
+  let total = 0
+  for (const group of [stills, animated]) {
+    if (group.length === 0) continue
+    const bytes = await sampleGroup(group, settings)
+    if (bytes === null) return null
+    total += bytes
+  }
+  return total
+}
+
+/** One real encode, scaled across the group by output frame-pixels. */
+async function sampleGroup(group: EstimateItem[], settings: ImageSettings): Promise<number | null> {
+  const sample = largest(group)
 
   let sampleBytes: number
   try {
@@ -144,20 +198,37 @@ async function estimateImage(items: EstimateItem[], settings: ImageSettings): Pr
     return null
   }
 
-  const out = targetSize(sampleMeta.width, sampleMeta.height, settings.maxEdge)
-  const perPixel = sampleBytes / Math.max(1, out.width * out.height)
+  // Frames multiplied by output pixels. For a still that is just the pixels, so
+  // this is the same arithmetic it always was; for a GIF it is the unit that
+  // actually scales, since doubling the frames roughly doubles the file.
+  const work = (item: EstimateItem) => {
+    const meta = imageMeta(item)
+    const out = targetSize(meta.width, meta.height, settings.maxEdge)
+    return Math.max(1, out.width * out.height * frameCount(item))
+  }
+  const perUnit = sampleBytes / work(sample)
 
   let total = 0
-  for (const item of usable) {
-    const meta = item.meta as Extract<ProbeMeta, { kind: 'image' }>
-    if (item === sample) {
-      total += capped(sampleBytes, item.file.size)
-      continue
-    }
-    const size = targetSize(meta.width, meta.height, settings.maxEdge)
-    total += capped(Math.round(perPixel * size.width * size.height), item.file.size)
+  for (const item of group) {
+    total +=
+      item === sample
+        ? capped(sampleBytes, item.file.size)
+        : capped(Math.round(perUnit * work(item)), item.file.size)
   }
   return total
+}
+
+function largest(group: EstimateItem[]): EstimateItem {
+  return group.reduce((a, b) => (b.file.size > a.file.size ? b : a))
+}
+
+function imageMeta(item: EstimateItem): Extract<ProbeMeta, { kind: 'image' }> {
+  return item.meta as Extract<ProbeMeta, { kind: 'image' }>
+}
+
+/** 1 for anything that isn't an animated GIF — see `ProbeMeta`. */
+function frameCount(item: EstimateItem): number {
+  return imageMeta(item).frames ?? 1
 }
 
 /**

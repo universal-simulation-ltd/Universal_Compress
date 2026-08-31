@@ -175,7 +175,22 @@ export interface CompressedFile {
  * second decode per file for a fact already in hand. See `fillDetail`.
  */
 export type ProbeMeta =
-  | { kind: 'image'; width: number; height: number }
+  | {
+      kind: 'image'
+      width: number
+      height: number
+      /**
+       * Frames, for an ANIMATED GIF only — absent for every other image,
+       * including a still GIF.
+       *
+       * It earns its place in the probe rather than being read again later
+       * because two different things need it and neither can afford its own
+       * pass over the file: the row's caption, and the size estimate, which
+       * prices a GIF per frame-pixel rather than per pixel. A 300-frame
+       * animation and a photograph of the same dimensions are not the same job.
+       */
+      frames?: number
+    }
   | { kind: 'video'; probe: VideoProbe }
   | { kind: 'audio'; seconds: number }
   | { kind: 'pdf'; pages: number }

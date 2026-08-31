@@ -76,7 +76,7 @@ function NothingUsableCard() {
           />
           <Capability
             label="Images"
-            body="JPEG, PNG, WebP, AVIF, HEIC, GIF and BMP — re-encoded and optionally resized."
+            body="JPEG, PNG, WebP, AVIF, HEIC, GIF and BMP — re-encoded and optionally resized. Animated GIFs stay animated."
           />
           <Capability
             label="Audio"

@@ -23,6 +23,13 @@ const EDGES: { value: MaxEdge; label: string }[] = [
 export default function ImagePanel({ count }: { count: string }) {
   const settings = useCompressStore((s) => s.image)
   const running = useCompressStore((s) => s.running)
+  // Shown only to somebody who actually has an animation in the queue. The
+  // rules below are real and worth stating, and they are also noise on a panel
+  // holding four photographs — which is what putting them in the level blurbs,
+  // where every image user reads them, would have done.
+  const animated = useCompressStore((s) =>
+    s.items.some((i) => i.meta?.kind === 'image' && (i.meta.frames ?? 1) > 1),
+  )
   const setLevel = useCompressStore((s) => s.setLevel)
   const update = useCompressStore((s) => s.updateImage)
 
@@ -48,6 +55,15 @@ export default function ImagePanel({ count }: { count: string }) {
           sub={sub}
         />
         <Blurb>{LEVEL_BLURB.image[settings.level]}</Blurb>
+        {animated && (
+          <Hint>
+            Animated GIFs stay animated: they are re-encoded frame by frame with a
+            single shared palette, and only what changes between frames is stored.
+            {settings.level === 'maximum'
+              ? ' At Maximum every second frame is also dropped, so the animation keeps its length but plays at half the frame rate.'
+              : ' Maximum also halves the frame rate.'}
+          </Hint>
+        )}
         {note}
       </Field>
 
@@ -60,9 +76,17 @@ export default function ImagePanel({ count }: { count: string }) {
             onChange={(format) => update({ format })}
           />
           <Hint>
-            Automatic keeps JPEGs as JPEGs and sends PNG, GIF and BMP to WebP —
-            re-encoding a PNG as a PNG usually makes it <em>bigger</em>, because it
-            throws away whatever the original optimiser did.
+            Automatic keeps JPEGs as JPEGs and sends PNG, still GIFs and BMP to
+            WebP — re-encoding a PNG as a PNG usually makes it <em>bigger</em>,
+            because it throws away whatever the original optimiser did.
+            {animated && (
+              <>
+                {' '}
+                An <em>animated</em> GIF is left as a GIF whichever of these you
+                pick: WebP and JPEG here are single images, so converting one
+                would quietly throw the animation away.
+              </>
+            )}
           </Hint>
         </Field>
 
@@ -78,7 +102,10 @@ export default function ImagePanel({ count }: { count: string }) {
             className="w-full accent-orange-600 disabled:opacity-50"
             aria-label="Image quality"
           />
-          <Hint>Below about 60% the softness starts to show on photographs.</Hint>
+          <Hint>
+            Below about 60% the softness starts to show on photographs.
+            {animated && ' For an animated GIF this sets the size of the colour palette instead — 70% is 179 of the 255 colours the format allows.'}
+          </Hint>
         </Field>
 
         <Field label="Longest edge">

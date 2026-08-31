@@ -33,12 +33,41 @@ who already know which knob they want; nobody has to open it.
 |---|---|---|---|
 | **PDF** | `.pdf` | `.pdf` | `pdf-lib` (lossless repack) or `pdf.js` + JPEG (rasterise) |
 | **Video** | `.mp4` `.m4v` `.mov` | `.mp4` (H.264 + AAC) | WebCodecs, via [`@unisim/media`](https://www.npmjs.com/package/@unisim/media) |
-| **Images** | `.jpg` `.png` `.webp` `.avif` `.gif` `.bmp` | JPEG / WebP / AVIF | the browser's canvas encoder |
+| **Images** | `.jpg` `.png` `.webp` `.avif` `.heic` `.gif` `.bmp` | JPEG / WebP / AVIF | the browser's canvas encoder |
+| **Animated GIF** | `.gif` | `.gif`, still animated | ours — `src/lib/gif/`, no dependency |
 | **Audio** | `.mp3` `.wav` `.m4a` `.flac` `.ogg` `.opus` `.aiff` | `.mp3` / `.m4a` | WebAudio + LAME (JS) or WebCodecs AAC |
 
 Anything else stays in the list with a sentence explaining why it can't be
 opened — a `.mkv` is told to remux, a `.zip` is told it is already compressed.
 Files are never silently dropped.
+
+### Animated GIFs
+
+An animated GIF gets its own codec rather than the canvas path, because the
+canvas path **destroyed it**: `createImageBitmap()` returns frame one of an
+animation and gives no indication it dropped the rest, so a 4.2 MB animation
+came out as a 2 KB still and the app reported "−100%" — its biggest saving — for
+having thrown the file away.
+
+No browser will read past frame one or write a GIF at all, so both halves are
+here and neither has a dependency: `src/lib/gif/decode.ts` (block chain, LZW,
+compositing, disposal methods, interlacing) and `src/lib/gif/encode.ts` (median-
+cut palette, quantiser, LZW, frame differencing — forked from Universal
+Converter's, which had no reader). The saving comes from a single global palette
+narrowed by the quality slider, from sending only the rectangle that changes
+between frames, from the longest-edge cap, and at Maximum from dropping every
+second frame while keeping the animation's length.
+
+Measured on two real screen recordings: 13% and 34% at Balanced, 15% and 44% at
+Maximum. Both were already optimised; a GIF exported as whole frames does far
+better.
+
+**`npm run test:gif` is the check that matters** — it decodes real GIFs written
+by other tools and compares every pixel against ffmpeg, then has ffmpeg read
+back what we write. `npm test` covers the same code without needing ffmpeg
+installed, but a reader and a writer that share a misunderstanding round-trip
+perfectly and produce files nothing else can open, so an outside reader is the
+only honest test.
 
 ### Two things it deliberately will not do
 

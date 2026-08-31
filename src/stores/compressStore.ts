@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { detectKind, type DetectedKind, type FileKind } from '../lib/kinds'
 import { compressFile, type AllSettings } from '../lib/compress'
-import { probeDimensions } from '../lib/compress/image'
+import { probeDimensions, probeGifFrames } from '../lib/compress/image'
 import { probeVideo } from '../lib/compress/video'
 import { probeDuration } from '../lib/compress/audio'
 import { saveBlob } from '../lib/download'
@@ -268,9 +268,15 @@ async function fillDetail(item: Item, set: Setter) {
     case 'image': {
       const size = await probeDimensions(item.file)
       if (!size) return
+      // Null for everything that is not an animated GIF, which is almost
+      // everything — and cheap to ask, because it is a scan of the block
+      // headers rather than a decode. See `probeGifFrames`.
+      const frames = await probeGifFrames(item.file)
       return patch(set, item.id, {
-        detail: `${size.width} × ${size.height}`,
-        meta: { kind: 'image', width: size.width, height: size.height },
+        detail: frames
+          ? `${size.width} × ${size.height} · ${frames} frames`
+          : `${size.width} × ${size.height}`,
+        meta: { kind: 'image', width: size.width, height: size.height, ...(frames ? { frames } : {}) },
       })
     }
     case 'pdf': {

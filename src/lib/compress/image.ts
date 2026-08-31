@@ -44,6 +44,26 @@ export async function compressImage(
   settings: ImageSettings,
   onProgress: (fraction: number) => void = () => {},
 ): Promise<CompressedFile> {
+  // ⚠️ **Before anything else, and never reorder this below the decode.**
+  //
+  // `createImageBitmap` on an animated GIF returns frame one and says nothing
+  // about the frames it dropped. Everything after this point is built on that
+  // call, so an animation reaching it does not fail — it succeeds, at producing
+  // a still. That is how this app used to turn a 4.2 MB animation into a 2 KB
+  // WebP and report "−100%", the biggest saving on the screen, for having
+  // destroyed the file. The animated path is in `./gif` and keeps it a GIF.
+  //
+  // Dynamic, and only entered for a file that already looks like a GIF: the
+  // reader, the palette builder and the LZW coder are ~15 KB that nobody who
+  // drops a photograph should download. See the note in `./index.ts`.
+  if (looksLikeGif(file)) {
+    const { compressIfAnimatedGif } = await import('./gif')
+    const animated = await compressIfAnimatedGif(file, settings, onProgress)
+    if (animated) return animated
+    // A still GIF falls through: it has no animation to protect, and the canvas
+    // path turns it into a much smaller WebP.
+  }
+
   let target = targetFormat(file, settings)
   // AVIF encoding is not in every browser's canvas. Rather than fail at the very
   // end of the job, check first and fall back to WebP, which is everywhere that
@@ -100,6 +120,35 @@ export function targetSize(
     width: Math.max(1, Math.round(width * scale)),
     height: Math.max(1, Math.round(height * scale)),
   }
+}
+
+/**
+ * Worth opening to see whether it is an animation?
+ *
+ * Deliberately generous: it costs a read of the file to find out for certain,
+ * and the cost of a false NO is silently destroying someone's animation, while
+ * the cost of a false yes is one wasted header check. So a `.gif` with no MIME
+ * type and an `image/gif` with no extension both qualify — the same reasoning
+ * `kinds.ts` gives for putting the extension ahead of `File.type`.
+ */
+function looksLikeGif(file: File): boolean {
+  return file.type.toLowerCase() === 'image/gif' || extensionOf(file.name) === 'gif'
+}
+
+/**
+ * Frames, if this file is an ANIMATED GIF. `null` for everything else,
+ * including a still GIF.
+ *
+ * Read on drop, alongside the dimensions, because the row's caption and the
+ * size estimate both want it and neither should pay for its own pass over the
+ * file — the same argument the other probes make in `fillDetail`. Dynamic, so
+ * the codec still isn't downloaded by anyone who never drops a GIF.
+ */
+export async function probeGifFrames(file: File): Promise<number | null> {
+  if (!looksLikeGif(file)) return null
+  const { probeGif } = await import('./gif')
+  const info = await probeGif(file)
+  return info && info.frames > 1 ? info.frames : null
 }
 
 const HEIC_EXT_RE = /\.(heic|heif)$/i
