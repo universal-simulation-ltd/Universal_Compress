@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "author": "Universal Simulation Ltd",
   "description": "Universal Compress — drop any file, make it smaller. PDFs, video, images and audio compressed entirely in your browser, nothing uploaded.",
   "scripts": {

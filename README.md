@@ -104,7 +104,7 @@ npm run build       # tsc -b && vite build
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+[AGPL-3.0-or-later](LICENSE), with an added permission for app-store distribution.
 
 Part of the [Universal Simulation](https://www.unisim.co.uk) suite — the
 Universal Apps are free forever and open source.
