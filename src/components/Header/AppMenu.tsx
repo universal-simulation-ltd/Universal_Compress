@@ -1,4 +1,9 @@
 import { AdvancedMenu } from '@unisim/sdk'
+// Generated — `npm run credits` after any dependency change. Never edit it by
+// hand: it is read off the installed tree, so a hand-kept list drifts from the
+// lockfile the first time anyone upgrades anything, and a credits list naming a
+// package we removed is worse than no list at all.
+import credits from '../../generated/credits.json'
 import { useCompressStore } from '../../stores/compressStore'
 
 // The per-app actions that slot into <UniversalAppsNavBar />'s `actions` prop —
@@ -30,6 +35,8 @@ export default function AppMenu() {
           subject: 'Your files',
           plural:  true,
           version: __APP_VERSION__,
+          credits,
+          noticesHref: 'https://github.com/universal-simulation-ltd/Universal_Compress/blob/main/THIRD-PARTY-NOTICES.md',
         }}
       />
     </>
