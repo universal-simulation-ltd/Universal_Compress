@@ -2,7 +2,7 @@ import { UniversalAppsNavBar, UpdateNotice } from '@unisim/sdk'
 import AppMenu from './components/Header/AppMenu'
 import ProductLogo from './components/Header/ProductLogo'
 import CompressApp from './components/compress/CompressApp'
-import UsageTracker from './UsageTracker'
+import { UsageTracker } from '@unisim/sdk'
 import { CONTAINER } from './lib/layout'
 
 const REPO_URL = 'https://github.com/universal-simulation-ltd/Universal_Compress'
