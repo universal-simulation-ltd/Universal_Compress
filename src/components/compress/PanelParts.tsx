@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useId, useState, type ReactNode } from 'react'
 
 // The settings vocabulary, shared by all four panels so a PDF and an MP4 are the
 // same instrument with different strings. Lifted deliberately from Universal
@@ -34,12 +34,14 @@ export function Panel({
   onToggle: () => void
   children: ReactNode
 }) {
+  const panelId = useId()
   return (
     <div className="rounded-xl border border-slate-200 bg-white">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
+        aria-controls={panelId}
         className={`group flex w-full items-center gap-2.5 px-4 py-3 text-left focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-orange-600 ${
           open ? 'border-b border-slate-200' : ''
         }`}
@@ -61,7 +63,7 @@ export function Panel({
           </svg>
         </span>
       </button>
-      {open && <div className="flex flex-col gap-4 p-4">{children}</div>}
+      {open && <div id={panelId} className="flex flex-col gap-4 p-4">{children}</div>}
     </div>
   )
 }
@@ -94,12 +96,14 @@ export function Collapsible({
   children: ReactNode
 }) {
   const [open, setOpen] = useState(defaultOpen)
+  const panelId = useId()
 
   return (
     <div className="flex flex-col gap-4">
       <button
         type="button"
         aria-expanded={open}
+        aria-controls={panelId}
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center gap-2 text-left focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600"
       >
