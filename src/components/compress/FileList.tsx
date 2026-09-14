@@ -8,7 +8,7 @@ export default function FileList() {
   if (items.length === 0) return null
 
   return (
-    <ul className="divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white">
+    <ul className="divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
       {items.map((item) => (
         <FileRow key={item.id} item={item} />
       ))}
@@ -25,39 +25,39 @@ function FileRow({ item }: { item: Item }) {
   const saved = item.result ? savingPercent(item.file.size, item.result.blob.size) : 0
 
   return (
-    <li className={`relative flex items-center gap-3 px-3.5 py-3 ${unsupported ? 'bg-slate-50' : ''}`}>
+    <li className={`relative flex items-center gap-3 px-3.5 py-3 ${unsupported ? 'bg-slate-50 dark:bg-slate-800/50' : ''}`}>
       <KindIcon kind={item.kind} />
 
       <div className="min-w-0 flex-1">
-        <p className={`truncate text-[12.5px] font-semibold ${unsupported ? 'text-slate-500' : 'text-slate-900'}`}>
+        <p className={`truncate text-[12.5px] font-semibold ${unsupported ? 'text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-slate-100'}`}>
           {item.file.name}
         </p>
 
         {unsupported ? (
-          <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">{item.reason}</p>
+          <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">{item.reason}</p>
         ) : item.status === 'failed' ? (
-          <p className="mt-0.5 text-[11px] leading-relaxed text-red-700">{item.error}</p>
+          <p className="mt-0.5 text-[11px] leading-relaxed text-red-700 dark:text-red-400">{item.error}</p>
         ) : (
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] tabular-nums text-slate-500">
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] tabular-nums text-slate-500 dark:text-slate-400">
             <span>{formatBytes(item.file.size)}</span>
             {item.detail && <span className="text-slate-400">· {item.detail}</span>}
             {item.result && !item.keptOriginal && (
               <>
-                <span aria-hidden className="text-slate-300">→</span>
-                <span className="font-semibold text-slate-700">{formatBytes(item.result.blob.size)}</span>
-                <span className="rounded-full bg-[#2F9E57]/12 px-1.5 py-0.5 text-[10px] font-bold text-[#166534]">
+                <span aria-hidden className="text-slate-300 dark:text-slate-600">→</span>
+                <span className="font-semibold text-slate-700 dark:text-slate-200">{formatBytes(item.result.blob.size)}</span>
+                <span className="rounded-full bg-[#2F9E57]/12 px-1.5 py-0.5 text-[10px] font-bold text-[#166534] dark:bg-emerald-500/15 dark:text-emerald-300">
                   −{saved}%
                 </span>
               </>
             )}
             {item.keptOriginal && (
-              <span className="text-slate-500">· already as small as it goes — kept the original</span>
+              <span className="text-slate-500 dark:text-slate-400">· already as small as it goes — kept the original</span>
             )}
           </p>
         )}
 
         {item.status === 'running' && (
-          <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-200">
+          <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
             <div
               className="h-full rounded-full bg-gradient-to-r from-[#FE8C01] to-[#E05504] transition-[width] duration-200"
               style={{ width: `${Math.round(item.progress * 100)}%` }}
@@ -70,7 +70,7 @@ function FileRow({ item }: { item: Item }) {
         <button
           type="button"
           onClick={() => downloadItem(item.id)}
-          className="shrink-0 rounded-lg bg-orange-500/12 px-2.5 py-1.5 text-[11.5px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600"
+          className="shrink-0 rounded-lg bg-orange-500/12 px-2.5 py-1.5 text-[11.5px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 dark:bg-orange-500/15 dark:text-orange-300 dark:hover:bg-orange-500/25"
         >
           Download
         </button>
@@ -81,7 +81,7 @@ function FileRow({ item }: { item: Item }) {
         disabled={running && item.status === 'running'}
         onClick={() => removeItem(item.id)}
         aria-label={`Remove ${item.file.name}`}
-        className="shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-30"
+        className="shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-30"
       >
         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <path d="M4 4l8 8M12 4l-8 8" />
@@ -97,14 +97,14 @@ function KindIcon({ kind }: { kind: DetectedKind }) {
     'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold uppercase tracking-wide'
   switch (kind) {
     case 'pdf':
-      return <span className={`${shell} bg-red-50 text-red-700`}>PDF</span>
+      return <span className={`${shell} bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-300`}>PDF</span>
     case 'video':
-      return <span className={`${shell} bg-indigo-50 text-indigo-700`}>VID</span>
+      return <span className={`${shell} bg-indigo-50 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300`}>VID</span>
     case 'image':
-      return <span className={`${shell} bg-emerald-50 text-emerald-700`}>IMG</span>
+      return <span className={`${shell} bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300`}>IMG</span>
     case 'audio':
-      return <span className={`${shell} bg-amber-50 text-amber-700`}>AUD</span>
+      return <span className={`${shell} bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300`}>AUD</span>
     default:
-      return <span className={`${shell} bg-slate-200 text-slate-500`}>?</span>
+      return <span className={`${shell} bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-300`}>?</span>
   }
 }

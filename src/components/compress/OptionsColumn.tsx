@@ -56,12 +56,12 @@ export default function OptionsColumn() {
  */
 function NothingUsableCard() {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white">
-      <div className="border-b border-slate-200 px-4 py-3">
-        <span className="text-[12.5px] font-bold text-slate-900">Nothing here can be compressed</span>
+    <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div className="border-b border-slate-200 px-4 py-3 dark:border-slate-800">
+        <span className="text-[12.5px] font-bold text-slate-900 dark:text-slate-100">Nothing here can be compressed</span>
       </div>
       <div className="flex flex-col gap-3 p-4">
-        <p className="text-[11.5px] leading-relaxed text-slate-500">
+        <p className="text-[11.5px] leading-relaxed text-slate-500 dark:text-slate-400">
           Every file in the list is one this app can’t open — the reason is on each row. Drop
           something below and its settings will appear here.
         </p>
@@ -91,10 +91,10 @@ function NothingUsableCard() {
 function Capability({ label, body }: { label: string; body: string }) {
   return (
     <li className="flex gap-2.5">
-      <span className="mt-0.5 flex h-5 w-11 shrink-0 items-center justify-center rounded bg-slate-100 text-[9.5px] font-bold uppercase tracking-wide text-slate-500">
+      <span className="mt-0.5 flex h-5 w-11 shrink-0 items-center justify-center rounded bg-slate-100 text-[9.5px] font-bold uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-300">
         {label}
       </span>
-      <span className="text-[11px] leading-relaxed text-slate-500">{body}</span>
+      <span className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">{body}</span>
     </li>
   )
 }
@@ -152,20 +152,20 @@ export function ActionCard() {
   const primary =
     'w-full rounded-xl bg-gradient-to-br from-[#FE8C01] to-[#E05504] px-4 py-3 text-[14px] font-bold text-white shadow-sm transition-opacity hover:opacity-95 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:cursor-not-allowed disabled:opacity-40'
   const secondary =
-    'w-full rounded-xl bg-orange-500/12 px-4 py-2.5 text-[13px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:cursor-not-allowed disabled:opacity-40'
+    'w-full rounded-xl bg-orange-500/12 px-4 py-2.5 text-[13px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 dark:bg-orange-500/15 dark:text-orange-300 dark:hover:bg-orange-500/25 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:cursor-not-allowed disabled:opacity-40'
 
   return (
     <div
       className={`rounded-xl border ${
-        t.done > 0 ? 'border-orange-200 bg-orange-50/60' : 'border-slate-200 bg-white'
+        t.done > 0 ? 'border-orange-200 bg-orange-50/60 dark:border-orange-900/70 dark:bg-orange-950/30' : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
       }`}
     >
       <div
         className={`flex items-center gap-2.5 border-b px-4 py-3 ${
-          t.done > 0 ? 'border-orange-200/70' : 'border-slate-200'
+          t.done > 0 ? 'border-orange-200/70 dark:border-orange-900/60' : 'border-slate-200 dark:border-slate-800'
         }`}
       >
-        <span className="text-[12.5px] font-bold text-slate-900">
+        <span className="text-[12.5px] font-bold text-slate-900 dark:text-slate-100">
           {t.done === 0
             ? 'Ready to compress'
             : allDone
@@ -194,21 +194,21 @@ export function ActionCard() {
             that saved are the supporting line under it, because they only mean
             anything relative to it. */}
         {t.done > 0 && (
-          <div className="rounded-lg bg-white/70 px-3 py-2.5 ring-1 ring-orange-200/70">
+          <div className="rounded-lg bg-white/70 px-3 py-2.5 ring-1 ring-orange-200/70 dark:bg-slate-900/70 dark:ring-orange-900/60">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-slate-500">
+              <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-slate-500 dark:text-slate-400">
                 {allDone ? 'New size' : 'So far'}
               </span>
               {saved >= 1 && (
-                <span className="rounded-full bg-[#2F9E57]/12 px-2 py-0.5 text-[11px] font-bold text-[#166534]">
+                <span className="rounded-full bg-[#2F9E57]/12 px-2 py-0.5 text-[11px] font-bold text-[#166534] dark:bg-emerald-500/15 dark:text-emerald-300">
                   −{saved}%
                 </span>
               )}
             </div>
-            <div className="mt-1 text-[26px] font-bold leading-none tabular-nums text-slate-900">
+            <div className="mt-1 text-[26px] font-bold leading-none tabular-nums text-slate-900 dark:text-slate-100">
               {formatBytes(t.bytesOutDone)}
             </div>
-            <div className="mt-1.5 text-[11px] leading-snug text-slate-500">
+            <div className="mt-1.5 text-[11px] leading-snug text-slate-500 dark:text-slate-400">
               {saved >= 1 ? (
                 <>
                   was <span className="tabular-nums line-through decoration-slate-400">{formatBytes(t.bytesInDone)}</span>
@@ -247,7 +247,7 @@ export function ActionCard() {
 
         {/* The saving used to be stated here as well; it is in the block
             above now, next to the number it is a saving ON. */}
-        <p className="text-center text-[10.5px] text-slate-500">
+        <p className="text-center text-[10.5px] text-slate-500 dark:text-slate-400">
           Compressed files go straight to your downloads. Nothing is uploaded.
         </p>
       </div>

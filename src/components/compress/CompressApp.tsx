@@ -1,6 +1,7 @@
 import { PrivacyNote } from '@unisim/sdk'
 import { CONTAINER } from '../../lib/layout'
 import { useCompressStore } from '../../stores/compressStore'
+import { useThemeStore } from '../../stores/themeStore'
 import LandingPage from '../Landing/LandingPage'
 import DropCircle from './DropCircle'
 import FileList from './FileList'
@@ -41,12 +42,14 @@ export default function CompressApp() {
   // is fine, but every other component here already subscribes to `items`, so
   // this adds no extra subscription and keeps one thing to reason about.
   const items = useCompressStore((s) => s.items)
+  const theme = useThemeStore((s) => s.effective)
 
   if (items.length === 0) return <LandingPage />
 
   return (
     <div className={`${CONTAINER} flex flex-col gap-4 py-5`}>
       <PrivacyNote
+        theme={theme}
         repo="https://github.com/universal-simulation-ltd/Universal_Compress"
         proof="https://github.com/universal-simulation-ltd/Universal_Compress/blob/main/PRIVACY.md"
         subject="Your files"
@@ -58,7 +61,7 @@ export default function CompressApp() {
             Apps that own those formats, with a "+" tile that opens the picker;
             the list under them is the same queue file by file. */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6 sm:px-8">
+          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6 dark:border-slate-800 dark:bg-slate-900 sm:px-8">
             <KindStrip />
           </div>
           <FileList />
@@ -70,7 +73,7 @@ export default function CompressApp() {
             they were at opposite ends of the page. */}
         <div className="flex flex-col gap-4">
           <OptionsColumn />
-          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6">
+          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6 dark:border-slate-800 dark:bg-slate-900">
             <DropCircle />
           </div>
           <ActionCard />

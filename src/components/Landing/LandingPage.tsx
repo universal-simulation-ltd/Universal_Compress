@@ -2,6 +2,7 @@ import { PrivacyNote } from '@unisim/sdk'
 import DropCircle from '../compress/DropCircle'
 import CompressIllustration from './CompressIllustration'
 import { CONTAINER } from '../../lib/layout'
+import { useThemeStore } from '../../stores/themeStore'
 
 /**
  * What the app opens on, before anything has been dropped.
@@ -20,6 +21,8 @@ import { CONTAINER } from '../../lib/layout'
  * to be handled twice.
  */
 export default function LandingPage() {
+  const theme = useThemeStore((s) => s.effective)
+
   return (
     <div className={`${CONTAINER} flex flex-col gap-4 py-5 lg:py-10`}>
       {/* Kept above the fold on the landing page too, deliberately. It is the
@@ -39,20 +42,20 @@ export default function LandingPage() {
             track cannot go below — one long unbreakable word would otherwise
             lay the whole column out wider than the phone. */}
         <div className="order-1 min-w-0 lg:order-2">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
-            Smaller files, <span className="text-orange-600">same quality</span>.
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl dark:text-slate-100">
+            Smaller files, <span className="text-orange-600 dark:text-orange-400">same quality</span>.
           </h1>
-          <p className="mt-3 max-w-md text-slate-600">
+          <p className="mt-3 max-w-md text-slate-600 dark:text-slate-300">
             Drop one or many, of any kind. The settings for whatever you dropped appear next to it.
           </p>
 
-          <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900">
             <DropCircle />
 
-            <div className="mt-5 flex items-center gap-3 text-xs text-slate-500">
-              <span className="h-px flex-1 bg-slate-200" aria-hidden="true" />
+            <div className="mt-5 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" aria-hidden="true" />
               <span>what it takes</span>
-              <span className="h-px flex-1 bg-slate-200" aria-hidden="true" />
+              <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" aria-hidden="true" />
             </div>
 
             {/* The four engines, which doubles as the answer to "will it take my
@@ -60,13 +63,13 @@ export default function LandingPage() {
                 video across to find out. The working screen's options column
                 says the same thing at more length; here it is the short form,
                 because the circle above it is the thing to read first. */}
-            <ul className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-600">
-              <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> PDF — repack or rasterise</li>
-              <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> MP4, M4V, MOV</li>
-              <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> JPEG, PNG, WebP, HEIC</li>
-              <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> MP3, WAV, M4A, FLAC</li>
-              <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> Mixed drops, one queue</li>
-              <li className="flex items-center gap-2"><span className="text-orange-700">✓</span> Batch ZIP download</li>
+            <ul className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-300">
+              <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> PDF — repack or rasterise</li>
+              <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> MP4, M4V, MOV</li>
+              <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> JPEG, PNG, WebP, HEIC</li>
+              <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> MP3, WAV, M4A, FLAC</li>
+              <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> Mixed drops, one queue</li>
+              <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> Batch ZIP download</li>
             </ul>
           </div>
 
@@ -77,6 +80,7 @@ export default function LandingPage() {
               This is also the suite's placement everywhere else. */}
           <PrivacyNote
             className="mt-4"
+            theme={theme}
             repo="https://github.com/universal-simulation-ltd/Universal_Compress"
             proof="https://github.com/universal-simulation-ltd/Universal_Compress/blob/main/PRIVACY.md"
             subject="Your files"

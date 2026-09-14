@@ -36,20 +36,20 @@ export function Panel({
 }) {
   const panelId = useId()
   return (
-    <div className="rounded-xl border border-slate-200 bg-white">
+    <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
         aria-controls={panelId}
         className={`group flex w-full items-center gap-2.5 px-4 py-3 text-left focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-orange-600 ${
-          open ? 'border-b border-slate-200' : ''
+          open ? 'border-b border-slate-200 dark:border-slate-800' : ''
         }`}
       >
         <span className="min-w-0">
-          <span className="block text-[12.5px] font-bold text-slate-900">{title}</span>
+          <span className="block text-[12.5px] font-bold text-slate-900 dark:text-slate-100">{title}</span>
           {!open && summary && (
-            <span className="mt-0.5 block text-[11px] leading-tight text-slate-500">{summary}</span>
+            <span className="mt-0.5 block text-[11px] leading-tight text-slate-500 dark:text-slate-400">{summary}</span>
           )}
         </span>
         <span className="ml-auto flex shrink-0 items-center gap-2">
@@ -57,7 +57,7 @@ export function Panel({
           <svg
             viewBox="0 0 12 12"
             aria-hidden="true"
-            className={`h-3 w-3 text-slate-400 transition-transform group-hover:text-slate-600 ${open ? 'rotate-180' : ''}`}
+            className={`h-3 w-3 text-slate-400 transition-transform group-hover:text-slate-600 dark:group-hover:text-slate-200 ${open ? 'rotate-180' : ''}`}
           >
             <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -71,14 +71,14 @@ export function Panel({
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-slate-600">{label}</span>
+      <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-slate-600 dark:text-slate-300">{label}</span>
       {children}
     </div>
   )
 }
 
 export function Divider() {
-  return <div className="h-px bg-slate-200" />
+  return <div className="h-px bg-slate-200 dark:bg-slate-800" />
 }
 
 // A disclosure for the knobs most people never touch. `summary` keeps the panel
@@ -107,7 +107,7 @@ export function Collapsible({
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center gap-2 text-left focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600"
       >
-        <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-slate-600">{label}</span>
+        <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-slate-600 dark:text-slate-300">{label}</span>
         {!open && summary && (
           <span className="min-w-0 flex-1 truncate text-[10.5px] text-slate-400">{summary}</span>
         )}
@@ -136,7 +136,7 @@ export function Segmented<T extends string | number>({
   onChange: (value: T) => void
 }) {
   return (
-    <div className="flex overflow-hidden rounded-lg border border-slate-200">
+    <div className="flex overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
       {options.map((o) => (
         <button
           key={String(o.value)}
@@ -145,7 +145,7 @@ export function Segmented<T extends string | number>({
           aria-pressed={value === o.value}
           onClick={() => onChange(o.value)}
           className={`flex-1 py-1.5 text-[11.5px] font-semibold transition-colors disabled:opacity-50 ${
-            value === o.value ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
+            value === o.value ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
           }`}
         >
           {o.label}
@@ -195,14 +195,14 @@ export function LevelPicker<T extends string>({
             className={`rounded-lg px-2 py-2 text-[12px] font-bold transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-50 ${
               active
                 ? 'bg-gradient-to-br from-[#FE8C01] to-[#E05504] text-white shadow-sm'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700/60'
             }`}
           >
             <span className="block">{o.label}</span>
             {sub && (
               <span
                 className={`mt-0.5 block text-[10px] font-semibold tabular-nums ${
-                  active ? 'text-white/85' : 'text-slate-500'
+                  active ? 'text-white/85' : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
                 {/* A non-breaking space, not an empty string: the line has to
@@ -237,7 +237,7 @@ export function Select<T extends string | number>({
         const picked = options.find((o) => String(o.value) === e.target.value)
         if (picked) onChange(picked.value)
       }}
-      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[12px] tabular-nums text-slate-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-50"
+      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-[12px] tabular-nums text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-50"
     >
       {options.map((o) => (
         <option key={String(o.value)} value={String(o.value)}>
@@ -271,12 +271,12 @@ export function Toggle({
       className="flex w-full items-center justify-between gap-3 text-left focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-50"
     >
       <span>
-        <span className="block text-[12px] font-semibold text-slate-900">{label}</span>
+        <span className="block text-[12px] font-semibold text-slate-900 dark:text-slate-100">{label}</span>
         <span className="block text-[10.5px] text-slate-400">{hint}</span>
       </span>
       <span
         className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
-          on ? 'bg-gradient-to-br from-[#FE8C01] to-[#E05504]' : 'bg-slate-300'
+          on ? 'bg-gradient-to-br from-[#FE8C01] to-[#E05504]' : 'bg-slate-300 dark:bg-slate-600'
         }`}
       >
         <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-[left] ${on ? 'left-4.5' : 'left-0.5'}`} />
@@ -287,7 +287,7 @@ export function Toggle({
 
 /** The one-line explanation under the strength control. */
 export function Blurb({ children }: { children: ReactNode }) {
-  return <p className="text-[11px] leading-relaxed text-slate-500">{children}</p>
+  return <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">{children}</p>
 }
 
 export function Hint({ children }: { children: ReactNode }) {

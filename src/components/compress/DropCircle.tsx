@@ -3,6 +3,7 @@ import DropWatermark from '../Landing/DropWatermark'
 import { ACCEPT } from '../../lib/kinds'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { useCompressStore, totals, type Item } from '../../stores/compressStore'
+import { useThemeStore } from '../../stores/themeStore'
 
 /**
  * The circle. It is the whole front of the app.
@@ -22,6 +23,7 @@ export default function DropCircle() {
   const items = useCompressStore((s) => s.items)
   const running = useCompressStore((s) => s.running)
   const addFiles = useCompressStore((s) => s.addFiles)
+  const theme = useThemeStore((s) => s.effective)
 
   const t = totals(items)
   const empty = t.eligible === 0
@@ -69,7 +71,12 @@ export default function DropCircle() {
             draws the suite's GENERIC one rather than nothing, so leaving it out
             here would put a drawing behind the live figures — exactly the case
             this is switching off. */}
+        {/* `uc-ring` is the hook index.css uses to paint the interior dark;
+            `track` is the resting pill colour — slate-700 in dark, where the
+            SDK default (slate-300) would glare. `undefined` keeps light as it was. */}
         <DropRing
+          className="uc-ring"
+          track={theme === 'dark' ? '#334155' : undefined}
           size="100%"
           over={drop.over}
           motion={empty ? 'idle' : running ? 'busy' : 'still'}
@@ -112,8 +119,8 @@ function EmptyCentre({ over }: { over: boolean }) {
         <path d="M9.5 18.5 12 16l2.5 2.5" />
         <path d="M4 12h16" />
       </svg>
-      <span className="text-[15px] font-bold text-slate-900">Drop any file here</span>
-      <span className="text-[11.5px] leading-relaxed text-slate-500">
+      <span className="text-[15px] font-bold text-slate-900 dark:text-slate-100">Drop any file here</span>
+      <span className="text-[11.5px] leading-relaxed text-slate-500 dark:text-slate-400">
         PDF · MP4 · MOV · JPEG · PNG · WebP · MP3 · WAV · M4A
       </span>
       <span className="mt-1 text-[11px] text-slate-400">or click to browse</span>
@@ -129,8 +136,8 @@ function LoadedCentre({ items, running }: { items: Item[]; running: boolean }) {
     const pct = Math.round(t.progress * 100)
     return (
       <>
-        <span className="text-[34px] font-bold leading-none tabular-nums text-slate-900">{pct}%</span>
-        <span className="mt-1.5 text-[12px] font-semibold text-slate-600">Compressing…</span>
+        <span className="text-[34px] font-bold leading-none tabular-nums text-slate-900 dark:text-slate-100">{pct}%</span>
+        <span className="mt-1.5 text-[12px] font-semibold text-slate-600 dark:text-slate-300">Compressing…</span>
         <span className="text-[11px] tabular-nums text-slate-400">
           {t.done} of {t.eligible} done
         </span>
@@ -147,11 +154,11 @@ function LoadedCentre({ items, running }: { items: Item[]; running: boolean }) {
     return (
       <>
         <span
-          className={`text-[38px] font-bold leading-none tabular-nums ${grew ? 'text-slate-400' : 'text-[#2F9E57]'}`}
+          className={`text-[38px] font-bold leading-none tabular-nums ${grew ? 'text-slate-400' : 'text-[#2F9E57] dark:text-emerald-400'}`}
         >
           {grew ? '—' : `−${saved}%`}
         </span>
-        <span className="mt-1.5 text-[12px] font-semibold tabular-nums text-slate-700">
+        <span className="mt-1.5 text-[12px] font-semibold tabular-nums text-slate-700 dark:text-slate-200">
           {formatBytes(t.bytesInDone)} → {formatBytes(t.bytesOutDone)}
         </span>
         <span className="text-[11px] text-slate-400">
@@ -163,10 +170,10 @@ function LoadedCentre({ items, running }: { items: Item[]; running: boolean }) {
 
   return (
     <>
-      <span className="text-[30px] font-bold leading-none tabular-nums text-slate-900">
+      <span className="text-[30px] font-bold leading-none tabular-nums text-slate-900 dark:text-slate-100">
         {t.eligible}
       </span>
-      <span className="mt-1 text-[12px] font-semibold text-slate-600">
+      <span className="mt-1 text-[12px] font-semibold text-slate-600 dark:text-slate-300">
         file{t.eligible === 1 ? '' : 's'} ready
       </span>
       <span className="text-[11px] tabular-nums text-slate-400">{formatBytes(t.bytesIn)}</span>

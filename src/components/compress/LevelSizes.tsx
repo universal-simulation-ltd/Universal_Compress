@@ -35,13 +35,13 @@ export function useLevelSizes(kind: FileKind, expanded = true) {
   const selected = estimates[settings.level]
   const note =
     selected.state === 'ready' && sourceBytes > 0 ? (
-      <p className="text-[11px] leading-relaxed text-slate-500">
-        <span className="font-semibold text-slate-700">≈ {formatBytes(selected.bytes)}</span>{' '}
+      <p className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+        <span className="font-semibold text-slate-700 dark:text-slate-200">≈ {formatBytes(selected.bytes)}</span>{' '}
         from {formatBytes(sourceBytes)}
         {savingPercent(sourceBytes, selected.bytes) >= 3 ? (
           <>
             {' — '}
-            <span className="font-semibold text-[#166534]">
+            <span className="font-semibold text-[#166534] dark:text-emerald-400">
               {savingPercent(sourceBytes, selected.bytes)}% smaller
             </span>
           </>
@@ -58,7 +58,7 @@ export function useLevelSizes(kind: FileKind, expanded = true) {
   const saved = selected.state === 'ready' ? savingPercent(sourceBytes, selected.bytes) : 0
   const summary = (
     <>
-      <span className="font-semibold text-slate-600">{levelLabel}</span>
+      <span className="font-semibold text-slate-600 dark:text-slate-300">{levelLabel}</span>
       {selected.state === 'ready' && (
         <>
           {' · '}
@@ -66,7 +66,7 @@ export function useLevelSizes(kind: FileKind, expanded = true) {
           {saved >= 3 && (
             <>
               {' · '}
-              <span className="font-semibold text-[#166534]">{saved}% smaller</span>
+              <span className="font-semibold text-[#166534] dark:text-emerald-400">{saved}% smaller</span>
             </>
           )}
         </>

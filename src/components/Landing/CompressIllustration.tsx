@@ -103,7 +103,7 @@ export default function CompressIllustration() {
           <g className="cmp-plate-in cmp-plate-in-top">
             <g className="cmp-plate-press cmp-plate-press-top">
               <rect x="112" y="76" width="276" height="24" rx="8" fill="url(#cmp-plate-fill)" />
-              <g fill="none" stroke="#c2410c" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+              <g className="cmp-chevrons" fill="none" stroke="#c2410c" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M178 106 l12 10 l12 -10" />
                 <path d="M238 106 l12 10 l12 -10" />
                 <path d="M298 106 l12 10 l12 -10" />
@@ -116,7 +116,7 @@ export default function CompressIllustration() {
           <g className="cmp-plate-in cmp-plate-in-bottom">
             <g className="cmp-plate-press cmp-plate-press-bottom">
               <rect x="112" y="336" width="276" height="24" rx="8" fill="url(#cmp-plate-fill)" />
-              <g fill="none" stroke="#c2410c" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
+              <g className="cmp-chevrons" fill="none" stroke="#c2410c" strokeWidth="4.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M178 330 l12 -10 l12 10" />
                 <path d="M238 330 l12 -10 l12 10" />
                 <path d="M298 330 l12 -10 l12 10" />
@@ -127,8 +127,8 @@ export default function CompressIllustration() {
 
         {/* −62%, stamped into the space the pile just gave back. */}
         <g className="cmp-badge" style={{ transformOrigin: '378px 172px' }}>
-          <rect x="330" y="150" width="96" height="44" rx="22" fill="#ecfdf5" stroke="#10b981" strokeWidth="2" />
-          <text x="378" y="180" textAnchor="middle" fontSize="21" fontWeight="700" fill="#059669" fontFamily="ui-sans-serif, system-ui">
+          <rect className="cmp-badge-bg" x="330" y="150" width="96" height="44" rx="22" fill="#ecfdf5" stroke="#10b981" strokeWidth="2" />
+          <text x="378" y="180" textAnchor="middle" className="cmp-badge-text" fontSize="21" fontWeight="700" fill="#059669" fontFamily="ui-sans-serif, system-ui">
             −62%
           </text>
         </g>
@@ -137,10 +137,10 @@ export default function CompressIllustration() {
             them: crossfading two lines of text on top of each other is
             unreadable for the whole overlap. Megabytes, not pixels — nothing
             about the file you get back is any smaller to look at. */}
-        <text className="cmp-size-before" x="250" y="402" textAnchor="middle" fontSize="17" fill="#64748b" fontFamily="ui-sans-serif, system-ui">
+        <text className="cmp-size-before cmp-ink-muted" x="250" y="402" textAnchor="middle" fontSize="17" fill="#64748b" fontFamily="ui-sans-serif, system-ui">
           3 files · 14.2 MB
         </text>
-        <text className="cmp-size-after" x="250" y="402" textAnchor="middle" fontSize="17" fontWeight="600" fill="#0f172a" fontFamily="ui-sans-serif, system-ui">
+        <text className="cmp-size-after cmp-ink" x="250" y="402" textAnchor="middle" fontSize="17" fontWeight="600" fill="#0f172a" fontFamily="ui-sans-serif, system-ui">
           3 files · 5.4 MB
         </text>
       </svg>
@@ -168,7 +168,7 @@ function Card({
 }) {
   return (
     <g className={className} style={{ transformOrigin: '250px 230px' }}>
-      <rect x="145" y="155" width="210" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" filter="url(#cmp-shadow)" />
+      <rect className="cmp-card-face" x="145" y="155" width="210" height="150" rx="14" fill="#ffffff" stroke="#cbd5e1" strokeWidth="2" filter="url(#cmp-shadow)" />
       {/* A coloured band across the top, clipped to the card's rounded corners.
           It is what the fan actually REVEALS: the cards behind are otherwise
           three white slivers, and "a few files" is a weaker thing to say than
@@ -178,16 +178,16 @@ function Card({
       <g clipPath="url(#cmp-card-clip)">
         <rect x="145" y="155" width="210" height="16" fill={chipInk} />
       </g>
-      <rect x="163" y="185" width="60" height="26" rx="7" fill={chipFill} />
-      <text x="193" y="204" textAnchor="middle" fontSize="15" fontWeight="700" fill={chipInk} fontFamily="ui-sans-serif, system-ui">
+      <rect className="cmp-chip" x="163" y="185" width="60" height="26" rx="7" fill={chipFill} />
+      <text x="193" y="204" textAnchor="middle" className="cmp-chip-text" fontSize="15" fontWeight="700" fill={chipInk} fontFamily="ui-sans-serif, system-ui">
         {chip}
       </text>
       {front && (
         <>
-          <rect x="235" y="192" width="102" height="11" rx="5.5" fill="#cbd5e1" />
-          <rect x="163" y="234" width="174" height="11" rx="5.5" fill="#e2e8f0" />
-          <rect x="163" y="256" width="174" height="11" rx="5.5" fill="#e2e8f0" />
-          <rect x="163" y="278" width="118" height="11" rx="5.5" fill="#e2e8f0" />
+          <rect className="cmp-line-strong" x="235" y="192" width="102" height="11" rx="5.5" fill="#cbd5e1" />
+          <rect x="163" y="234" width="174" height="11" rx="5.5" fill="#e2e8f0" className="cmp-line" />
+          <rect x="163" y="256" width="174" height="11" rx="5.5" fill="#e2e8f0" className="cmp-line" />
+          <rect x="163" y="278" width="118" height="11" rx="5.5" fill="#e2e8f0" className="cmp-line" />
         </>
       )}
     </g>

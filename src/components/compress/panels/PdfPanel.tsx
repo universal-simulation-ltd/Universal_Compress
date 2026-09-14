@@ -35,7 +35,7 @@ export default function PdfPanel({ count }: { count: string }) {
           effect nobody can predict without trying it, which is what the three
           presets exist to spare people. */}
       {level !== 'light' && (
-        <p className="rounded-lg bg-amber-50 px-2.5 py-2 text-[11.5px] leading-relaxed text-amber-800">
+        <p className="rounded-lg bg-amber-50 px-2.5 py-2 text-[11.5px] leading-relaxed text-amber-800 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-1 dark:ring-amber-900/60">
           Text stops being selectable at this setting — each page becomes a
           picture of itself. Choose <strong>Light</strong> if the document needs
           to stay searchable.

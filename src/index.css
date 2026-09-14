@@ -1,8 +1,33 @@
 @import "tailwindcss";
 
+/* Tailwind 4 defaults `dark:` to the OS media query. We drive it from a class
+   on <html> instead, because the suite rule is that an app opens LIGHT and only
+   goes dark when the user says so — see stores/themeStore.ts. With the media
+   default, a laptop set to dark would override that on first paint. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 html, body {
   height: 100%;
   margin: 0;
+}
+
+/* The ground under everything — overscroll, and any gap before React paints —
+   so a dark page never flashes white at its edges. slate-950, the page colour. */
+html.dark {
+  background-color: #020617;
+}
+
+/* The drop circle's interior, dark. The SDK's <DropRing> paints it with a fill
+   ATTRIBUTE (#ffffff, or #fff7ed while a file is over it) and, as of 0.141, has
+   no theme for it. A CSS `fill` beats a presentation attribute, so this swaps
+   it without touching light. In light the disc is the same white as the card it
+   sits on; in dark it is the same slate-900 as the dark card, which is the same
+   relationship. The resting pills are the `track` prop — see DropCircle.tsx. */
+.dark .uc-ring circle[fill="#ffffff"] {
+  fill: #0f172a;
+}
+.dark .uc-ring circle[fill="#fff7ed"] {
+  fill: #2b1d16;
 }
 
 /* min-height (not a fixed height) so the page grows with its content and the
@@ -192,6 +217,27 @@ body {
 
 /* Reduced motion is handled in CompressIllustration.tsx, which parks `--t` at 1
    and never starts the loop — the finished frame, not a slower version of it. */
+
+/* The same drawing, dark. The SVG keeps its light colours as fill/stroke
+   ATTRIBUTES, and a CSS fill/stroke beats a presentation attribute — so light
+   is untouched and each rule here only names a part's dark face. What is not
+   here stays as it is in both themes: the orange plates, the dashed ghost and
+   each card's coloured band. */
+.dark .cmp-illu .cmp-card-face {
+  fill: #1e293b;   /* slate-800 — a card lifted off the slate-950 page */
+  stroke: #475569;
+}
+.dark .cmp-illu .cmp-line-strong { fill: #64748b; }
+.dark .cmp-illu .cmp-line { fill: #334155; }
+/* The type chips go from a pastel tile to a wash of their own ink, and the
+   letters lighten to stay readable on it. */
+.dark .cmp-illu .cmp-chip { fill: rgba(148, 163, 184, 0.16); }
+.dark .cmp-illu .cmp-chip-text { fill: #f1f5f9; }
+.dark .cmp-illu .cmp-chevrons { stroke: #fb923c; }
+.dark .cmp-illu .cmp-badge-bg { fill: #022c22; }
+.dark .cmp-illu .cmp-badge-text { fill: #34d399; }
+.dark .cmp-illu .cmp-ink-muted { fill: #94a3b8; }
+.dark .cmp-illu .cmp-ink { fill: #f1f5f9; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

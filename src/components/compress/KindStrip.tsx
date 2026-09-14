@@ -82,13 +82,13 @@ export default function KindStrip() {
           // the width of the first row's three. Same size always, centred.
           className={`flex w-[108px] flex-col items-center gap-1.5 rounded-xl border px-2 py-2.5 ${
             g.kind === 'unsupported'
-              ? 'border-slate-200 bg-slate-50'
-              : 'border-slate-200 bg-white'
+              ? 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/60'
+              : 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900'
           }`}
         >
           {g.kind === 'unsupported' ? (
             <span
-              className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-200 text-[12px] font-bold text-slate-500"
+              className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-200 text-[12px] font-bold text-slate-500 dark:bg-slate-700 dark:text-slate-300"
               aria-hidden="true"
             >
               ?
@@ -100,7 +100,7 @@ export default function KindStrip() {
               {APP_MARKS[MARK_FOR[g.kind]]}
             </span>
           )}
-          <span className="text-center text-[11.5px] font-bold leading-tight text-slate-800">
+          <span className="text-center text-[11.5px] font-bold leading-tight text-slate-800 dark:text-slate-100">
             {g.kind === 'unsupported'
               ? g.count === 1 ? '1 not supported' : `${g.count} not supported`
               : kindLabel(g.kind, g.count)}
@@ -118,13 +118,13 @@ export default function KindStrip() {
         title="Add more files"
         className={`flex w-[108px] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed px-2 py-2.5 transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 ${
           add.over
-            ? 'border-orange-400 bg-orange-50'
-            : 'border-slate-300 bg-white hover:border-orange-400 hover:bg-orange-50/40'
+            ? 'border-orange-400 bg-orange-50 dark:bg-orange-950/40'
+            : 'border-slate-300 bg-white hover:border-orange-400 hover:bg-orange-50/40 dark:border-slate-600 dark:bg-slate-900 dark:hover:border-orange-400 dark:hover:bg-orange-950/30'
         }`}
       >
         <span
           className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-            add.over ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
+            add.over ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300' : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
           }`}
           aria-hidden="true"
         >
@@ -132,7 +132,7 @@ export default function KindStrip() {
             <path d="M10 4v12M4 10h12" />
           </svg>
         </span>
-        <span className="text-center text-[11.5px] font-bold leading-tight text-slate-700">Add more</span>
+        <span className="text-center text-[11.5px] font-bold leading-tight text-slate-700 dark:text-slate-200">Add more</span>
         <span className="text-[10.5px] text-slate-400">or drop</span>
       </div>
 

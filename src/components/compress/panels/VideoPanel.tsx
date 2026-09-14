@@ -75,7 +75,7 @@ export default function VideoPanel({ count }: { count: string }) {
       </Field>
 
       {supported === false && (
-        <p className="rounded-lg bg-amber-50 px-2.5 py-2 text-[11.5px] leading-relaxed text-amber-800">
+        <p className="rounded-lg bg-amber-50 px-2.5 py-2 text-[11.5px] leading-relaxed text-amber-800 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-1 dark:ring-amber-900/60">
           This browser has no WebCodecs H.264 encoder, so video can’t be
           compressed here — Chrome, Edge and Safari 16.4+ have one. PDFs, images
           and audio still work.
@@ -141,7 +141,7 @@ export default function VideoPanel({ count }: { count: string }) {
           href="https://opensource.unisim.co.uk/video"
           target="_blank"
           rel="noreferrer"
-          className="font-semibold text-slate-500 underline-offset-2 hover:text-orange-700 hover:underline"
+          className="font-semibold text-slate-500 underline-offset-2 hover:text-orange-700 hover:underline dark:text-slate-300 dark:hover:text-orange-400"
         >
           Universal Video
         </a>{' '}
