@@ -1,3 +1,4 @@
+import { ValueChip } from '@unisim/sdk'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { kindLabel } from '../../lib/kinds'
 import { useCompressStore, kindsPresent, totals } from '../../stores/compressStore'
@@ -200,9 +201,9 @@ export function ActionCard() {
                 {allDone ? 'New size' : 'So far'}
               </span>
               {saved >= 1 && (
-                <span className="rounded-full bg-[#2F9E57]/12 px-2 py-0.5 text-[11px] font-bold text-[#166534] dark:bg-emerald-500/15 dark:text-emerald-300">
+                <ValueChip size="sm" tone="good">
                   −{saved}%
-                </span>
+                </ValueChip>
               )}
             </div>
             <div className="mt-1 text-[26px] font-bold leading-none tabular-nums text-slate-900 dark:text-slate-100">

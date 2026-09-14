@@ -1,3 +1,4 @@
+import { ValueChip } from '@unisim/sdk'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { useCompressStore, type Item } from '../../stores/compressStore'
 import type { DetectedKind } from '../../lib/kinds'
@@ -45,9 +46,9 @@ function FileRow({ item }: { item: Item }) {
               <>
                 <span aria-hidden className="text-slate-300 dark:text-slate-600">→</span>
                 <span className="font-semibold text-slate-700 dark:text-slate-200">{formatBytes(item.result.blob.size)}</span>
-                <span className="rounded-full bg-[#2F9E57]/12 px-1.5 py-0.5 text-[10px] font-bold text-[#166534] dark:bg-emerald-500/15 dark:text-emerald-300">
+                <ValueChip size="sm" tone="good">
                   −{saved}%
-                </span>
+                </ValueChip>
               </>
             )}
             {item.keptOriginal && (
