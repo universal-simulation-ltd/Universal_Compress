@@ -5,7 +5,7 @@ import { AdvancedMenu, MENU, type MenuTheme } from '@unisim/sdk'
 // package we removed is worse than no list at all.
 import credits from '../../generated/credits.json'
 import { useCompressStore } from '../../stores/compressStore'
-import { useThemeStore, type ThemePref } from '../../stores/themeStore'
+import { useThemeStore } from '../../stores/themeStore'
 
 // The per-app actions that slot into <UniversalAppsNavBar />'s `actions` prop —
 // ROWS ONLY, no trigger and no panel of its own. The SDK renders them inside the
@@ -21,68 +21,43 @@ import { useThemeStore, type ThemePref } from '../../stores/themeStore'
 // here. The `light` column is exactly what these rows have always rendered; the
 // `dark` column is the SDK's own dropdown palette, so the rows match the panel
 // they sit in.
+//
+// The Appearance rows (Light / Dark / Match my device) that used to be here
+// are gone since SDK 0.143: colour scheme is a Global preference now, and this
+// app's override of it is the Colour scheme row in the SDK's App preferences
+// dialog, offered because App.tsx passes `themeStore` to the navbar. Don't add
+// them back — two controls for one setting, and only one can "follow global".
 const ROW: Record<MenuTheme, {
   rest: string
   disabled: string
   hoverBg: string
   hoverText: string
-  selectedBg: string
-  selectedText: string
-  label: string
 }> = {
   light: {
     rest: '#374151',
     disabled: '#94a3b8',
     hoverBg: '#fff7ed',
     hoverText: '#c2410c',
-    selectedBg: '#fff7ed',
-    selectedText: '#c2410c',
-    label: MENU.light.faint,
   },
   dark: {
     rest: MENU.dark.body,
     disabled: MENU.dark.faint,
     hoverBg: MENU.dark.rowHover,
     hoverText: MENU.dark.rowHoverText,
-    selectedBg: MENU.dark.accentBg,
-    selectedText: MENU.dark.accentText,
-    label: MENU.dark.faint,
   },
 }
-
-const THEMES: { pref: ThemePref; label: string; icon: string }[] = [
-  { pref: 'light', label: 'Light', icon: '☀️' },
-  { pref: 'dark', label: 'Dark', icon: '🌙' },
-  // 'system' is offered but is deliberately NOT the default — see themeStore.
-  { pref: 'system', label: 'Match my device', icon: '🖥️' },
-]
 
 export default function AppMenu() {
   const items = useCompressStore((s) => s.items)
   const running = useCompressStore((s) => s.running)
   const clearQueue = useCompressStore((s) => s.clearQueue)
   const resetSettings = useCompressStore((s) => s.resetSettings)
-  const pref = useThemeStore((s) => s.pref)
-  const setPref = useThemeStore((s) => s.setPref)
   const theme = useThemeStore((s) => s.effective)
 
   return (
     <>
       <MenuRow theme={theme} icon="🧹" label="Clear the list" disabled={running || items.length === 0} onClick={clearQueue} />
       <MenuRow theme={theme} icon="↩️" label="Reset the settings" disabled={running} onClick={resetSettings} />
-
-      <MenuLabel theme={theme}>Appearance</MenuLabel>
-      {THEMES.map((t) => (
-        <MenuRow
-          key={t.pref}
-          theme={theme}
-          icon={t.icon}
-          label={t.label}
-          selected={pref === t.pref}
-          disabled={false}
-          onClick={() => setPref(t.pref)}
-        />
-      ))}
 
       {/* Advanced — the SDK's own category, so every app in the suite has one in
           the same place, and whatever goes in it next is one change rather than
@@ -106,41 +81,22 @@ export default function AppMenu() {
   )
 }
 
-function MenuLabel({ theme, children }: { theme: MenuTheme; children: string }) {
-  return (
-    <div
-      style={{
-        padding: '8px 14px 4px',
-        fontSize: 11,
-        fontWeight: 600,
-        letterSpacing: '0.06em',
-        textTransform: 'uppercase',
-        color: ROW[theme].label,
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
 function MenuRow({
   theme,
   icon,
   label,
   disabled,
-  selected = false,
   onClick,
 }: {
   theme: MenuTheme
   icon: string
   label: string
   disabled: boolean
-  selected?: boolean
   onClick: () => void
 }) {
   const c = ROW[theme]
-  const restBg = selected ? c.selectedBg : 'transparent'
-  const restColor = disabled ? c.disabled : selected ? c.selectedText : c.rest
+  const restBg = 'transparent'
+  const restColor = disabled ? c.disabled : c.rest
   return (
     <button
       type="button"
@@ -174,7 +130,6 @@ function MenuRow({
     >
       <span aria-hidden>{icon}</span>
       <span style={{ flex: 1 }}>{label}</span>
-      {selected && <span aria-hidden style={{ color: c.selectedText }}>✓</span>}
     </button>
   )
 }

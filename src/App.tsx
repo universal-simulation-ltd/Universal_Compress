@@ -33,6 +33,10 @@ export default function App() {
         productHomeHref={import.meta.env.BASE_URL}
         actions={<AppMenu />}
         actionsLabel="Compress"
+        // App preferences' Colour scheme row (Follow global / Light / Dark /
+        // System) is bound to this store. With the menu's Appearance rows gone,
+        // that row is where this app's own light/dark override is chosen.
+        themeStore={useThemeStore}
         // No `products` prop: the SDK's own catalogue carries `compress` from
         // 0.87.0, so the navbar reads the product name from there. A local
         // catalogue lived here until then — two catalogues that disagree is how

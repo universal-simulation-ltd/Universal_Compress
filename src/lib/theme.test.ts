@@ -11,8 +11,9 @@ import { describe, expect, it } from 'vitest'
 // share one constant between a bundled module and a script that must run during
 // head parsing — so instead, renaming either without the other fails here.
 //
-// It is not a style rule. The key IS every user's saved choice: change it and
-// everybody who chose dark is silently back on light.
+// It is not a style rule. The key IS every user's saved choice for this app (since
+// SDK 0.143, their override of the global colour scheme): change it and everybody
+// who chose dark here is silently back to following global.
 
 const read = (rel: string) => readFileSync(fileURLToPath(new URL(`../../${rel}`, import.meta.url)), 'utf8')
 
@@ -32,6 +33,15 @@ function headScript(): string {
 describe('the pre-paint theme script', () => {
   it('reads the same localStorage key as the theme store', () => {
     expect(headScript()).toContain(`localStorage.getItem('${storeKey()}')`)
+  })
+
+  // Since SDK 0.143 an absent app key means "follow Global preferences". Without
+  // this fallback someone whose only choice is the global Dark gets a light first
+  // frame and then a flip once the store loads.
+  it('falls back to the global colour scheme, then to light', () => {
+    expect(headScript()).toMatch(
+      new RegExp(`localStorage\\.getItem\\('${storeKey()}'\\)\\s*\\|\\|\\s*localStorage\\.getItem\\('universal:color-scheme'\\)\\s*\\|\\|\\s*'light'`),
+    )
   })
 
   it('puts the dark class on <html> before anything is painted', () => {
