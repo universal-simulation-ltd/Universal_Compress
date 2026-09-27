@@ -11,6 +11,7 @@ import { UsageTracker } from '@unisim/sdk'
 import { CONTAINER } from './lib/layout'
 import { useCompressStore } from './stores/compressStore'
 import { useThemeStore } from './stores/themeStore'
+import { KNOWLEDGE_BASE } from './knowledge'
 
 const REPO_URL = 'https://github.com/universal-simulation-ltd/Universal_Compress'
 
@@ -64,6 +65,9 @@ export default function App() {
         // switcher, so there is deliberately only one now.
         suiteSwitcherIconSrc={`${import.meta.env.BASE_URL}unisim-icon.png`}
         contentClassName={CONTAINER}
+        // Actions ▸ Advanced ▸ Knowledge base (SDK 0.163.0): this app's own
+        // articles, bundled from ./knowledge so they read offline.
+        knowledgeBase={KNOWLEDGE_BASE}
         about={ABOUT}
         // "Reset to defaults" at the foot of Tune this app. Withheld while a
         // batch is running, as the old actions-menu row was disabled then.
