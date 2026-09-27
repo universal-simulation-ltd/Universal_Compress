@@ -1,9 +1,4 @@
-import { AdvancedMenu, MENU, type MenuTheme } from '@unisim/sdk'
-// Generated — `npm run credits` after any dependency change. Never edit it by
-// hand: it is read off the installed tree, so a hand-kept list drifts from the
-// lockfile the first time anyone upgrades anything, and a credits list naming a
-// package we removed is worse than no list at all.
-import credits from '../../generated/credits.json'
+import { MENU, type MenuTheme } from '@unisim/sdk'
 import { useCompressStore } from '../../stores/compressStore'
 import { useThemeStore } from '../../stores/themeStore'
 
@@ -15,6 +10,10 @@ import { useThemeStore } from '../../stores/themeStore'
 // Styling is inline rather than Tailwind to match the SDK dropdown's own rows
 // (the same 8px/14px rhythm and 13px label the profile and language rows use) —
 // these render inside SDK chrome, not ours.
+//
+// No "Reset the settings" and no Advanced ▸ About here any more (2026-09-27):
+// since SDK 0.161.0 both sit at the foot of "Tune this app", from the navbar's
+// `onResetDefaults` and `about` props in App.tsx.
 //
 // ⚠️ Inline styles cannot answer the `.dark` class, and the SDK does NOT theme
 // an app's own `actions` rows — so the colours branch on the resolved theme
@@ -51,32 +50,11 @@ export default function AppMenu() {
   const items = useCompressStore((s) => s.items)
   const running = useCompressStore((s) => s.running)
   const clearQueue = useCompressStore((s) => s.clearQueue)
-  const resetSettings = useCompressStore((s) => s.resetSettings)
   const theme = useThemeStore((s) => s.effective)
 
   return (
     <>
       <MenuRow theme={theme} icon="🧹" label="Clear the list" disabled={running || items.length === 0} onClick={clearQueue} />
-      <MenuRow theme={theme} icon="↩️" label="Reset the settings" disabled={running} onClick={resetSettings} />
-
-      {/* Advanced — the SDK's own category, so every app in the suite has one in
-          the same place, and whatever goes in it next is one change rather than
-          nineteen. "About this app" is always its last row.
-
-          ⚠️ `theme` is required now there is a dark mode: the section is inline
-          styles, and left on light it renders as a pale strip in a dark menu. */}
-      <AdvancedMenu
-        theme={theme}
-        about={{
-          repo:    'https://github.com/universal-simulation-ltd/Universal_Compress',
-          proof:   'https://github.com/universal-simulation-ltd/Universal_Compress/blob/main/PRIVACY.md',
-          subject: 'Your files',
-          plural:  true,
-          version: __APP_VERSION__,
-          credits,
-          noticesHref: 'https://github.com/universal-simulation-ltd/Universal_Compress/blob/main/THIRD-PARTY-NOTICES.md',
-        }}
-      />
     </>
   )
 }
