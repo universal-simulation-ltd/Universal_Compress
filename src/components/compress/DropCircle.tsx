@@ -3,7 +3,6 @@ import DropWatermark from '../Landing/DropWatermark'
 import { ACCEPT } from '../../lib/kinds'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { useCompressStore, totals, type Item } from '../../stores/compressStore'
-import { useThemeStore } from '../../stores/themeStore'
 
 /**
  * The circle. It is the whole front of the app.
@@ -23,7 +22,6 @@ export default function DropCircle() {
   const items = useCompressStore((s) => s.items)
   const running = useCompressStore((s) => s.running)
   const addFiles = useCompressStore((s) => s.addFiles)
-  const theme = useThemeStore((s) => s.effective)
 
   const t = totals(items)
   const empty = t.eligible === 0
@@ -71,12 +69,9 @@ export default function DropCircle() {
             draws the suite's GENERIC one rather than nothing, so leaving it out
             here would put a drawing behind the live figures — exactly the case
             this is switching off. */}
-        {/* `uc-ring` is the hook index.css uses to paint the interior dark;
-            `track` is the resting pill colour — slate-700 in dark, where the
-            SDK default (slate-300) would glare. `undefined` keeps light as it was. */}
+        {/* No theme wiring: since SDK 0.164 the ring (and <DropAnywhere>
+            below) follow `<html class="dark">` themselves. */}
         <DropRing
-          className="uc-ring"
-          track={theme === 'dark' ? '#334155' : undefined}
           size="100%"
           over={drop.over}
           motion={empty ? 'idle' : running ? 'busy' : 'still'}

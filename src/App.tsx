@@ -28,10 +28,6 @@ const ABOUT: AboutAppConfig = {
   noticesHref: 'https://github.com/universal-simulation-ltd/Universal_Compress/blob/main/THIRD-PARTY-NOTICES.md',
 }
 
-// <UpdateNotice> is inline-styled amber with no theme of its own; its `style`
-// spreads last, so this is the dark face of the same callout.
-const UPDATE_NOTICE_DARK = { border: '1px solid #78350f', background: '#451a03', color: '#fde68a' }
-
 export default function App() {
   // The RESOLVED theme ('system' already turned into light or dark) — the SDK
   // components below are inline-styled and cannot read the `.dark` class.
@@ -81,7 +77,7 @@ export default function App() {
           See the SDK's useAppUpdate: an autoUpdate PWA hands the new worker
           control but leaves the running page on its old JavaScript. */}
       <div className={`${CONTAINER} pt-4 empty:hidden`}>
-        <UpdateNotice style={theme === 'dark' ? UPDATE_NOTICE_DARK : undefined} />
+        <UpdateNotice />
       </div>
 
       <UsageTracker />

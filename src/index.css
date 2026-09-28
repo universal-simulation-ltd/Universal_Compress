@@ -17,19 +17,6 @@ html.dark {
   background-color: #020617;
 }
 
-/* The drop circle's interior, dark. The SDK's <DropRing> paints it with a fill
-   ATTRIBUTE (#ffffff, or #fff7ed while a file is over it) and, as of 0.141, has
-   no theme for it. A CSS `fill` beats a presentation attribute, so this swaps
-   it without touching light. In light the disc is the same white as the card it
-   sits on; in dark it is the same slate-900 as the dark card, which is the same
-   relationship. The resting pills are the `track` prop — see DropCircle.tsx. */
-.dark .uc-ring circle[fill="#ffffff"] {
-  fill: #0f172a;
-}
-.dark .uc-ring circle[fill="#fff7ed"] {
-  fill: #2b1d16;
-}
-
 /* min-height (not a fixed height) so the page grows with its content and the
    document — including the footer — scrolls naturally on small screens. */
 #root {
