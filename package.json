@@ -16,8 +16,9 @@
     "test:gif": "node scripts/gif-selftest.mjs",
     "test:watch": "vitest",
     "build:desktop": "tsc -b && vite build --mode desktop",
-    "cap:sync": "npm run build:desktop && npx cap sync && npm run check:mobile-bundle",
+    "cap:sync": "npm run build:desktop && npx cap sync && npm run check:mobile-bundle && npm run check:ios-launch",
     "check:mobile-bundle": "node scripts/verify-mobile-bundle.mjs",
+    "check:ios-launch": "node scripts/verify-ios-launch.mjs",
     "cap:open:ios": "npx cap open ios"
   },
   "dependencies": {
