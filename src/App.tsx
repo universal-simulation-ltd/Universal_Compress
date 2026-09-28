@@ -11,6 +11,7 @@ import { UsageTracker } from '@unisim/sdk'
 import { CONTAINER } from './lib/layout'
 import { useCompressStore } from './stores/compressStore'
 import { useThemeStore } from './stores/themeStore'
+import { useSystemBarsStyle } from './lib/systemBars'
 import { KNOWLEDGE_BASE } from './knowledge'
 
 const REPO_URL = 'https://github.com/universal-simulation-ltd/Universal_Compress'
@@ -35,6 +36,8 @@ export default function App() {
   // The RESOLVED theme ('system' already turned into light or dark) — the SDK
   // components below are inline-styled and cannot read the `.dark` class.
   const theme = useThemeStore((s) => s.effective)
+  // The native status-bar glyphs follow it wherever the page is under them.
+  useSystemBarsStyle(theme)
   const running = useCompressStore((s) => s.running)
   const resetSettings = useCompressStore((s) => s.resetSettings)
 
@@ -87,7 +90,9 @@ export default function App() {
         <CompressApp />
       </main>
 
-      <footer className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      {/* pb-[env(safe-area-inset-bottom)] keeps the last line of the page off
+          the home indicator / gesture bar in the native build; 0 everywhere else. */}
+      <footer className="border-t border-slate-200 bg-white pb-[env(safe-area-inset-bottom)] dark:border-slate-800 dark:bg-slate-900">
         <div className={`${CONTAINER} flex flex-row items-center gap-3 py-4 text-xs text-slate-500 sm:gap-4 dark:text-slate-400`}>
           <span>
             100% free — every feature, no paywalls. Open source, hosted by{' '}
