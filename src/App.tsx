@@ -32,7 +32,7 @@ export default function App() {
   // The RESOLVED theme ('system' already turned into light or dark) — the SDK
   // components below are inline-styled and cannot read the `.dark` class.
   const theme = useThemeStore((s) => s.effective)
-  // The native status-bar glyphs follow it wherever the page is under them.
+  // The native status bar (its strip on Android, and the glyphs) follows it.
   useSystemBarsStyle(theme)
   const running = useCompressStore((s) => s.running)
   const resetSettings = useCompressStore((s) => s.resetSettings)
