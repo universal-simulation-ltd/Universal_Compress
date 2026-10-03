@@ -44,50 +44,72 @@ export async function compressPdf(
   }
 
   const { renderScale, jpegQuality } = RASTER[settings.level]
-  // pdf.js detaches the buffer it is handed, so give it a copy and keep the
-  // original for pdf-lib (which we use only to read each page's size).
+  // ⚠️ pdf.js alone, for the pixels AND the page size. The size used to come
+  // from pdf-lib's MediaBox, which ignores /Rotate and the CropBox — so a
+  // rotated landscape page was squashed into a portrait box. pdf.js's
+  // viewport is the page as it is SHOWN, which is what the picture is of.
   const pdfjsDoc = await pdfjsLib.getDocument({ data: sourceBytes.slice(0) }).promise
-  const srcPdf = await PDFDocument.load(sourceBytes)
-  const out = await PDFDocument.create()
-  const pageCount = srcPdf.getPageCount()
+  try {
+    const out = await PDFDocument.create()
+    const pageCount = pdfjsDoc.numPages
 
-  for (let i = 0; i < pageCount; i++) {
-    const { width, height } = srcPdf.getPage(i).getSize()
-    const imgBytes = await rasterizePageToJpeg(pdfjsDoc, i, renderScale, jpegQuality)
-    const img = await out.embedJpg(imgBytes)
-    const page = out.addPage([width, height])
-    page.drawImage(img, { x: 0, y: 0, width, height })
-    // Rendering is nearly all the wall-clock, so the bar is the page counter.
-    onProgress(0.05 + ((i + 1) / pageCount) * 0.9)
+    for (let i = 0; i < pageCount; i++) {
+      const { jpeg, width, height } = await rasterizePageToJpeg(pdfjsDoc, i, renderScale, jpegQuality)
+      const img = await out.embedJpg(jpeg)
+      const page = out.addPage([width, height])
+      page.drawImage(img, { x: 0, y: 0, width, height })
+      // Rendering is nearly all the wall-clock, so the bar is the page counter.
+      onProgress(0.05 + ((i + 1) / pageCount) * 0.9)
+    }
+
+    const bytes = await out.save({ useObjectStreams: true })
+    onProgress(1)
+    return { blob: new Blob([bytes as BlobPart], { type: 'application/pdf' }), name }
+  } finally {
+    // The worker holds its own copy of the whole file until told to let go.
+    await pdfjsDoc.destroy()
   }
-
-  const bytes = await out.save({ useObjectStreams: true })
-  onProgress(1)
-  return { blob: new Blob([bytes as BlobPart], { type: 'application/pdf' }), name }
 }
 
-// Render one source page through pdf.js at the given scale and return JPEG bytes.
+/**
+ * WebKit refuses a canvas over 16,777,216 pixels (getContext/toBlob just fail),
+ * and a large-format page at 1.5× gets there. Kept a little under the line.
+ */
+const MAX_CANVAS_PIXELS = 16_000_000
+
+// Render one source page through pdf.js at the given scale and return JPEG
+// bytes, plus the page's DISPLAYED size in points (rotation and crop applied).
 async function rasterizePageToJpeg(
   pdfjsDoc: PDFDocumentProxy,
   pageIndex: number,
   renderScale: number,
   jpegQuality: number,
-): Promise<Uint8Array> {
+): Promise<{ jpeg: Uint8Array; width: number; height: number }> {
   const page = await pdfjsDoc.getPage(pageIndex + 1)
-  const viewport = page.getViewport({ scale: renderScale })
+  const shown = page.getViewport({ scale: 1 })
+  const cap = Math.sqrt(MAX_CANVAS_PIXELS / Math.max(1, shown.width * shown.height))
+  const viewport = page.getViewport({ scale: Math.min(renderScale, cap) })
   const canvas = document.createElement('canvas')
-  canvas.width = viewport.width
-  canvas.height = viewport.height
-  const ctx = canvas.getContext('2d')
-  if (!ctx) throw new Error('This browser wouldn’t give us a canvas to draw on')
-  // JPEG has no alpha — paint white first so transparent regions don't go black.
-  ctx.fillStyle = '#ffffff'
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-  await page.render({ canvasContext: ctx, viewport }).promise
-  const blob: Blob = await new Promise((resolve, reject) => {
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/jpeg', jpegQuality)
-  })
-  return new Uint8Array(await blob.arrayBuffer())
+  canvas.width = Math.max(1, Math.floor(viewport.width))
+  canvas.height = Math.max(1, Math.floor(viewport.height))
+  try {
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('This browser wouldn’t give us a canvas to draw on')
+    // JPEG has no alpha — paint white first so transparent regions don't go black.
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    await page.render({ canvasContext: ctx, viewport }).promise
+    const blob: Blob = await new Promise((resolve, reject) => {
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/jpeg', jpegQuality)
+    })
+    return { jpeg: new Uint8Array(await blob.arrayBuffer()), width: shown.width, height: shown.height }
+  } finally {
+    // iOS counts a canvas against its memory budget until it is collected;
+    // zeroing it hands the backing store back now. Same for pdf.js's caches.
+    canvas.width = 0
+    canvas.height = 0
+    page.cleanup()
+  }
 }
 
 /**
@@ -140,25 +162,31 @@ export async function samplePdfBytes(file: File, level: Level): Promise<number |
 
     const { renderScale, jpegQuality } = RASTER[level]
     const pdfjsDoc = await pdfjsLib.getDocument({ data: sourceBytes.slice(0) }).promise
-    const pageCount = pdfjsDoc.numPages
-    if (pageCount === 0) return null
+    try {
+      const pageCount = pdfjsDoc.numPages
+      if (pageCount === 0) return null
 
-    // Evenly spread through the BODY: for three samples that is the sixth, the
-    // half and the five-sixths, so neither cover can be one of them.
-    const wanted = Math.min(3, pageCount)
-    const indices = [...new Set(
-      Array.from({ length: wanted }, (_, k) =>
-        Math.min(pageCount - 1, Math.floor((pageCount * (k + 0.5)) / wanted)),
-      ),
-    )]
-    let sampled = 0
-    for (const i of indices) {
-      sampled += (await rasterizePageToJpeg(pdfjsDoc, i, renderScale, jpegQuality)).length
+      // Evenly spread through the BODY: for three samples that is the sixth, the
+      // half and the five-sixths, so neither cover can be one of them.
+      const wanted = Math.min(3, pageCount)
+      const indices = [...new Set(
+        Array.from({ length: wanted }, (_, k) =>
+          Math.min(pageCount - 1, Math.floor((pageCount * (k + 0.5)) / wanted)),
+        ),
+      )]
+      let sampled = 0
+      for (const i of indices) {
+        sampled += (await rasterizePageToJpeg(pdfjsDoc, i, renderScale, jpegQuality)).jpeg.length
+      }
+      // ~2 KB of page object, xref and image dictionary per page on top of the
+      // JPEG itself, plus the file's own fixed boxes.
+      const perPage = sampled / indices.length + 2048
+      return Math.round(perPage * pageCount) + 4096
+    } finally {
+      // Estimates run per level and per settings change; without this each one
+      // left a whole copy of the PDF inside the pdf.js worker.
+      await pdfjsDoc.destroy()
     }
-    // ~2 KB of page object, xref and image dictionary per page on top of the
-    // JPEG itself, plus the file's own fixed boxes.
-    const perPage = sampled / indices.length + 2048
-    return Math.round(perPage * pageCount) + 4096
   } catch {
     // No estimate is better than a wrong one — the caller shows nothing.
     return null
