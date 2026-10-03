@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { outputName, savingPercent } from './layout'
+import { outputName, savingPercent, uniqueNames } from './layout'
 
 describe('the output filename', () => {
   it('versions a plain file rather than describing what happened to it', () => {
@@ -58,5 +58,22 @@ describe('savingPercent', () => {
     expect(savingPercent(100, 120)).toBe(-20)
     expect(savingPercent(100, 40)).toBe(60)
     expect(savingPercent(0, 40)).toBe(0)
+  })
+})
+
+describe('names inside the zip', () => {
+  it('numbers a repeat instead of letting it overwrite the first', () => {
+    const named = uniqueNames([
+      { name: 'a-v1.webp' },
+      { name: 'b-v1.jpg' },
+      { name: 'A-v1.webp' },
+      { name: 'a-v1.webp' },
+    ]).map((f) => f.name)
+    expect(named).toEqual(['a-v1.webp', 'b-v1.jpg', 'A-v1 (2).webp', 'a-v1 (3).webp'])
+  })
+
+  it('leaves distinct names exactly as they were', () => {
+    const files = [{ name: 'x.pdf' }, { name: 'y.pdf' }]
+    expect(uniqueNames(files)).toEqual(files)
   })
 })

@@ -76,7 +76,7 @@ export default function AudioPanel({ count }: { count: string }) {
 
         <Toggle
           label="Mix down to mono"
-          hint="Halves the size. Right for speech, wrong for music"
+          hint="The bitrate above sets the size, not this. Mono sounds cleaner at a low bitrate, so it suits speech. Wrong for music"
           on={settings.mono}
           disabled={running}
           onChange={(mono) => update({ mono })}

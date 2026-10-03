@@ -5,6 +5,7 @@ import { probeDimensions, probeGifFrames } from '../lib/compress/image'
 import { probeVideo } from '../lib/compress/video'
 import { probeDuration } from '../lib/compress/audio'
 import { saveBlob } from '../lib/download'
+import { uniqueNames } from '../lib/layout'
 import { createZip } from '@unisim/media'
 import {
   DEFAULT_AUDIO_SETTINGS,
@@ -244,7 +245,7 @@ export const useCompressStore = create<CompressState>((set, get) => ({
       .map((i) => ({ name: i.result!.name, blob: i.result!.blob }))
     if (done.length === 0) return
     if (done.length === 1) return saveBlob(done[0].blob, done[0].name)
-    saveBlob(await createZip(done), 'compressed-files.zip')
+    saveBlob(await createZip(uniqueNames(done)), 'compressed-files.zip')
   },
 }))
 

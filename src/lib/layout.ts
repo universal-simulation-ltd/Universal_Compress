@@ -38,3 +38,27 @@ export function savingPercent(before: number, after: number): number {
 export function outputName(filename: string, ext: string): string {
   return versionedName(filename, { ext })
 }
+
+/**
+ * A zip holds one entry per name: `a.png` and a still `a.gif` both come out as
+ * `a-v1.webp`, and the second used to land on top of the first. Number the
+ * repeats instead — `a-v1 (2).webp` — the way a file manager would.
+ */
+export function uniqueNames<T extends { name: string }>(files: T[]): T[] {
+  const seen = new Set<string>()
+  return files.map((file) => {
+    const key = (n: string) => n.toLowerCase()
+    if (!seen.has(key(file.name))) {
+      seen.add(key(file.name))
+      return file
+    }
+    const dot = file.name.lastIndexOf('.')
+    const stem = dot > 0 ? file.name.slice(0, dot) : file.name
+    const ext = dot > 0 ? file.name.slice(dot) : ''
+    let n = 2
+    while (seen.has(key(`${stem} (${n})${ext}`))) n++
+    const name = `${stem} (${n})${ext}`
+    seen.add(key(name))
+    return { ...file, name }
+  })
+}

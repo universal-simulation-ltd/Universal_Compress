@@ -59,6 +59,7 @@ export function useLevelEstimates(kind: FileKind, all = true): LevelEstimates {
   const video = useCompressStore((s) => s.video)
   const image = useCompressStore((s) => s.image)
   const audio = useCompressStore((s) => s.audio)
+  const running = useCompressStore((s) => s.running)
 
   const mine = items.filter((i) => i.kind === kind)
   const settings: LevelSettings = { pdf, video, image, audio }
@@ -74,6 +75,11 @@ export function useLevelEstimates(kind: FileKind, all = true): LevelEstimates {
 
   useEffect(() => {
     if (mine.length === 0) return
+    // Not while the real run is going: an estimate is a real encode of a
+    // sample (a PDF render, a whole GIF), and two at once is exactly what
+    // `compressAll` runs files one at a time to avoid. The effect re-runs when
+    // the run ends, and anything already measured comes from the cache.
+    if (running) return
     let alive = true
 
     // Debounced: dragging the quality slider fires this on every tick, and each
@@ -108,7 +114,7 @@ export function useLevelEstimates(kind: FileKind, all = true): LevelEstimates {
     // `mine` and `settings` are rebuilt every render; the two signature strings
     // are their stable identity, which is what this should actually depend on.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [kind, queueSig, liveSig, selected, all])
+  }, [kind, queueSig, liveSig, selected, all, running])
 
   if (mine.length === 0) return WORKING
   return estimates
