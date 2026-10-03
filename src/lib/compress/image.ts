@@ -2,6 +2,7 @@ import { outputName } from '../layout'
 import { isHeicFile } from './heicSniff'
 import { extensionOf } from '../kinds'
 import type { CompressedFile, ImageSettings } from '../types'
+import { targetSize } from './size'
 
 // Images go through the browser's own decoder and canvas encoder: decode →
 // (optional) downscale → re-encode. No library, no download, nothing leaves the
@@ -72,18 +73,71 @@ export async function compressImage(
   if (target.mime === 'image/avif' && !(await canEncode('image/avif'))) {
     target = { mime: 'image/webp', ext: 'webp', lossy: true }
   }
+  // ⚠️ And WebP is not everywhere either: Safari — so every iPhone, and this
+  // app's own iOS build — DECODES WebP but cannot encode it, and its toBlob
+  // quietly hands back a PNG. Asked for "WebP" there, the honest answer is
+  // JPEG for a photo and PNG for anything that may carry transparency.
+  if (target.mime === 'image/webp' && !(await canEncode('image/webp'))) {
+    const ext = extensionOf(file.name)
+    const photo = ext === 'jpg' || ext === 'jpeg' || ext === 'heic' || ext === 'heif'
+    target = photo
+      ? { mime: 'image/jpeg', ext: 'jpg', lossy: true }
+      : { mime: 'image/png', ext: 'png', lossy: false }
+  }
 
   const bitmap = await decode(file)
   onProgress(0.4)
 
   try {
-    const { width, height } = targetSize(bitmap.width, bitmap.height, settings.maxEdge)
-    const canvas = document.createElement('canvas')
-    canvas.width = width
-    canvas.height = height
+    const wanted = targetSize(bitmap.width, bitmap.height, settings.maxEdge)
+    let blob = await drawAndEncode(bitmap, wanted, target, settings.quality)
+    // WebKit refuses any canvas over 16.7 MP, and a 48 MP iPhone photo at
+    // "source" size is three times that. Rather than guess per browser, try
+    // the size asked for and only step down when the browser says no.
+    if (!blob && wanted.width * wanted.height > MAX_CANVAS_PIXELS) {
+      const k = Math.sqrt(MAX_CANVAS_PIXELS / (wanted.width * wanted.height))
+      const capped = {
+        width: Math.max(1, Math.floor(wanted.width * k)),
+        height: Math.max(1, Math.floor(wanted.height * k)),
+      }
+      blob = await drawAndEncode(bitmap, capped, target, settings.quality)
+    }
+    if (!blob) throw new Error('The image couldn’t be re-encoded')
+    onProgress(1)
 
+    // Name the file by what the encoder REALLY wrote: a browser without an
+    // encoder returns a PNG rather than failing, and a PNG called .webp is a
+    // file that some apps then refuse to open.
+    const ext = EXT_FOR_MIME[blob.type] ?? target.ext
+    return { blob, name: outputName(file.name, ext) }
+  } finally {
+    bitmap.close()
+  }
+}
+
+/** Just under WebKit's 16,777,216-pixel canvas limit. */
+const MAX_CANVAS_PIXELS = 16_000_000
+
+const EXT_FOR_MIME: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/avif': 'avif',
+}
+
+/** One draw-and-encode at a fixed size. Null when the browser refuses the canvas. */
+async function drawAndEncode(
+  bitmap: ImageBitmap,
+  { width, height }: { width: number; height: number },
+  target: { mime: string; lossy: boolean },
+  quality: number,
+): Promise<Blob | null> {
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  try {
     const ctx = canvas.getContext('2d')
-    if (!ctx) throw new Error('This browser wouldn’t give us a canvas to draw on')
+    if (!ctx) return null
 
     // JPEG has no alpha: without a white ground, transparent pixels come out
     // black instead of the white everyone expects.
@@ -93,35 +147,19 @@ export async function compressImage(
     }
     ctx.imageSmoothingQuality = 'high'
     ctx.drawImage(bitmap, 0, 0, width, height)
-    onProgress(0.7)
 
-    const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, target.mime, target.lossy ? settings.quality : undefined),
+    return await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, target.mime, target.lossy ? quality : undefined),
     )
-    if (!blob) throw new Error('The image couldn’t be re-encoded')
-    onProgress(1)
-
-    return { blob, name: outputName(file.name, target.ext) }
   } finally {
-    bitmap.close()
+    // iOS counts a canvas against a small memory budget until it is collected;
+    // zeroing it returns the backing store now, which matters across a batch.
+    canvas.width = 0
+    canvas.height = 0
   }
 }
 
-/** Longest edge capped at `maxEdge`, aspect preserved. Never scales UP. */
-export function targetSize(
-  width: number,
-  height: number,
-  maxEdge: ImageSettings['maxEdge'],
-): { width: number; height: number } {
-  if (maxEdge === 'source') return { width, height }
-  const longest = Math.max(width, height)
-  if (longest <= maxEdge) return { width, height }
-  const scale = maxEdge / longest
-  return {
-    width: Math.max(1, Math.round(width * scale)),
-    height: Math.max(1, Math.round(height * scale)),
-  }
-}
+export { targetSize } from './size'
 
 /**
  * Worth opening to see whether it is an animation?
