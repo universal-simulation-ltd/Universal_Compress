@@ -1,6 +1,6 @@
 import { ValueChip } from '@unisim/sdk'
 import { formatBytes, savingPercent } from '../../lib/layout'
-import { useCompressStore, type Item } from '../../stores/compressStore'
+import { totals, useCompressStore, type Item } from '../../stores/compressStore'
 import type { DetectedKind } from '../../lib/kinds'
 
 /** The queue, under the circle. One row per dropped file, whatever became of it. */
@@ -14,6 +14,34 @@ export default function FileList() {
         <FileRow key={item.id} item={item} />
       ))}
     </ul>
+  )
+}
+
+/**
+ * What a screen reader hears while the batch runs. ALWAYS mounted — a live
+ * region that appears together with its first message is often not announced
+ * at all — and fed per file rather than per percent, so it says something
+ * worth hearing instead of reading out a counter.
+ */
+export function StatusAnnouncer() {
+  const items = useCompressStore((s) => s.items)
+  const running = useCompressStore((s) => s.running)
+  const t = totals(items)
+  let message = ''
+  if (running) {
+    message = `Compressing… ${t.done} of ${t.eligible} done`
+  } else if (t.done > 0 && t.pending === t.failed) {
+    const saved = savingPercent(t.bytesInDone, t.bytesOutDone)
+    message =
+      `Finished. ${t.done} ${t.done === 1 ? 'file' : 'files'} ready to download` +
+      (saved > 0 ? `, ${saved}% smaller` : '') +
+      (t.failed > 0 ? `. ${t.failed} couldn’t be compressed` : '') +
+      '.'
+  }
+  return (
+    <p role="status" aria-live="polite" className="sr-only">
+      {message}
+    </p>
   )
 }
 
@@ -58,7 +86,14 @@ function FileRow({ item }: { item: Item }) {
         )}
 
         {item.status === 'running' && (
-          <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+          <div
+            role="progressbar"
+            aria-label={`Compressing ${item.file.name}`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(item.progress * 100)}
+            className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"
+          >
             <div
               className="h-full rounded-full bg-gradient-to-r from-[#FE8C01] to-[#E05504] transition-[width] duration-200"
               style={{ width: `${Math.round(item.progress * 100)}%` }}
@@ -71,6 +106,7 @@ function FileRow({ item }: { item: Item }) {
         <button
           type="button"
           onClick={() => downloadItem(item.id)}
+          aria-label={`Download ${item.result.name}`}
           className="shrink-0 rounded-lg bg-orange-500/12 px-2.5 py-1.5 text-[11.5px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 dark:bg-orange-500/15 dark:text-orange-300 dark:hover:bg-orange-500/25"
         >
           Download

@@ -4,7 +4,7 @@ import { useCompressStore } from '../../stores/compressStore'
 import { useThemeStore } from '../../stores/themeStore'
 import LandingPage from '../Landing/LandingPage'
 import DropCircle from './DropCircle'
-import FileList from './FileList'
+import FileList, { StatusAnnouncer } from './FileList'
 import KindStrip from './KindStrip'
 import OptionsColumn, { ActionCard } from './OptionsColumn'
 
@@ -65,6 +65,7 @@ export default function CompressApp() {
             <KindStrip />
           </div>
           <FileList />
+          <StatusAnnouncer />
         </div>
 
         {/* Right: what will happen to it, and the button that does it. The
