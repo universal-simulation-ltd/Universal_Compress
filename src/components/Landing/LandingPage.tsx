@@ -45,8 +45,11 @@ export default function LandingPage() {
           <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl dark:text-slate-100">
             Smaller files, <span className="text-orange-600 dark:text-orange-400">same quality</span>.
           </h1>
+          {/* What goes in and where it happens, first. "The settings for
+              whatever you dropped appear next to it" explained the next
+              screen's layout to someone deciding whether to drop anything. */}
           <p className="mt-3 max-w-md text-slate-600 dark:text-slate-300">
-            Drop one or many, of any kind. The settings for whatever you dropped appear next to it.
+            Make PDFs, videos, photos and audio smaller, right here on your device. Drop one or many.
           </p>
 
           <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900">
@@ -64,7 +67,7 @@ export default function LandingPage() {
                 says the same thing at more length; here it is the short form,
                 because the circle above it is the thing to read first. */}
             <ul className="mt-4 grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-300">
-              <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> PDF — repack or rasterise</li>
+              <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> PDF, scans included</li>
               <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> MP4, M4V, MOV</li>
               <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> JPEG, PNG, WebP, HEIC</li>
               <li className="flex items-center gap-2"><span className="text-orange-700 dark:text-orange-400">✓</span> MP3, WAV, M4A, FLAC</li>

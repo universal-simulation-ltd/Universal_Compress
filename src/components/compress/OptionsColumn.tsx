@@ -69,7 +69,7 @@ function NothingUsableCard() {
         <ul className="flex flex-col gap-2">
           <Capability
             label="PDF"
-            body="Repack losslessly, or rasterise the pages. Big wins on scans."
+            body="Tidied up with nothing lost, or each page turned into a picture. Big wins on scans."
           />
           <Capability
             label="Video"

@@ -98,7 +98,7 @@ export default function App() {
               rel="noreferrer"
               className="text-slate-700 underline-offset-2 hover:text-orange-700 hover:underline dark:text-slate-200 dark:hover:text-orange-400"
             >
-              UNI SIM
+              UNI·SIM
             </a>
           </span>
           <a
