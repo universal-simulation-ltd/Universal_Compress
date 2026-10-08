@@ -17,8 +17,13 @@
  * ABOVE them.
  */
 
-/** One pass: the file, then the plates closing on it. */
-const LOOP_MS = 9000
+/**
+ * How long one stroke takes to draw. It draws ONCE and stays drawn (James,
+ * 2026-10-08): the old draw-hold-fade loop every 9 s repainted these strokes
+ * on the main thread for as long as the page was open, for nobody. Same pace
+ * as the loop had. Universal PDF's ring and the SDK's default did the same.
+ */
+const DRAW_MS = 2000
 
 // ⚠️ pathLength={100} on every animated path, so the dash numbers below are
 // PERCENTAGES of each stroke rather than measured lengths. Without it every
@@ -28,15 +33,15 @@ const CSS = `
   .cw-file, .cw-fold, .cw-top, .cw-bottom {
     stroke-dasharray: 100;
     stroke-dashoffset: 100;
-    animation-duration: ${LOOP_MS}ms;
-    animation-iteration-count: infinite;
+    animation-duration: ${DRAW_MS}ms;
+    animation-iteration-count: 1;
+    animation-fill-mode: both;
     animation-timing-function: ease-in-out;
   }
   @keyframes cw-draw {
-    0%        { stroke-dashoffset: 100; opacity: 0; }
-    4%        { opacity: 1; }
-    22%, 82%  { stroke-dashoffset: 0; opacity: 1; }
-    94%, 100% { stroke-dashoffset: 0; opacity: 0; }
+    0%   { stroke-dashoffset: 100; opacity: 0; }
+    18%  { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
   }
   .cw-file   { animation-name: cw-draw; animation-delay: 0ms; }
   .cw-fold   { animation-name: cw-draw; animation-delay: 400ms; }
