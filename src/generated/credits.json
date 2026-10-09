@@ -1,8 +1,8 @@
 {
   "app": "universal-compress",
   "appVersion": "0.1.0",
-  "generated": "2026-09-28",
-  "noticesCount": 24,
+  "generated": "2026-10-09",
+  "noticesCount": 25,
   "ships": [
     {
       "name": "@breezystack/lamejs",
