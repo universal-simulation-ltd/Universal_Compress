@@ -24,6 +24,7 @@
 /compress/icon-180.png         /icon-180.png         200
 /compress/icon-192.png         /icon-192.png         200
 /compress/icon-512.png         /icon-512.png         200
+/compress/Example_Image.jpg    /Example_Image.jpg    200
 
 # SEO crawler files.
 /compress/robots.txt           /robots.txt           200
