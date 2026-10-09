@@ -102,6 +102,7 @@ Per video, immagini e audio, tutto ciò che un livello sceglie è visibile in **
 - **Le GIF animate restano animate.** Hanno un trattamento dedicato, e con Maximum viene eliminato un fotogramma su due mantenendo la durata dell’animazione.
 - **Il video richiede un browser adatto.** La compressione video usa il codificatore video integrato nel browser, presente in Chrome, Edge e Safari 16.4 o successivi. PDF, immagini e audio funzionano in qualsiasi browser recente.
 - **Alcuni contenitori video non sono supportati.** MP4, M4V e MOV funzionano. MKV, WebM, AVI, WMV e FLV vanno prima convertiti in MP4.
+- **Nessun file a portata di mano?** **Try with an example photo**, nella prima schermata, carica una foto di esempio inclusa nell’app, così puoi vedere cosa fa prima di usare i tuoi file. Come tutto il resto, non lascia mai il tuo dispositivo.
 - **Salvataggio.** Scarica i file uno alla volta, oppure tutti insieme in uno ZIP. Quello ZIP si limita a raccogliere i risultati; non li comprime ulteriormente.
 - **Riprova quando vuoi.** Cambia livello e comprimi di nuovo tutto l’elenco per confrontare le dimensioni.`,
   },

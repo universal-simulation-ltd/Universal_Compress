@@ -102,6 +102,7 @@ For video, images and audio, everything a level chooses is shown under **Advance
 - **Animated GIFs stay animated.** They get their own treatment, and at Maximum every second frame is dropped while the animation keeps its length.
 - **Video needs a capable browser.** Video compression uses the browser's built-in video encoder, found in Chrome, Edge and Safari 16.4 or later. PDFs, images and audio work in any modern browser.
 - **Some video containers are not supported.** MP4, M4V and MOV work. MKV, WebM, AVI, WMV and FLV need converting to MP4 first.
+- **Nothing to hand?** **Try with an example photo**, on the first screen, loads a sample photo that comes with the app, so you can see what it does before using your own files. Like everything else, it never leaves your device.
 - **Saving.** Download files one at a time, or all at once as a ZIP. That ZIP only bundles the results together; it does not squeeze them any further.
 - **Try again freely.** Change the level and compress the whole list again to compare sizes.`,
   },

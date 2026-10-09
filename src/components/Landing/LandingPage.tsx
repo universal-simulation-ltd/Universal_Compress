@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import { PrivacyNote } from '@unisim/sdk'
 import DropCircle from '../compress/DropCircle'
 import CompressIllustration from './CompressIllustration'
 import { CONTAINER } from '../../lib/layout'
 import { useThemeStore } from '../../stores/themeStore'
+import { useCompressStore } from '../../stores/compressStore'
 
 /**
  * What the app opens on, before anything has been dropped.
@@ -22,6 +24,29 @@ import { useThemeStore } from '../../stores/themeStore'
  */
 export default function LandingPage() {
   const theme = useThemeStore((s) => s.effective)
+  const addFiles = useCompressStore((s) => s.addFiles)
+  const [loadingExample, setLoadingExample] = useState(false)
+
+  // "Try with an example", as Universal Images and the others have it (James,
+  // 2026-10-09): the one thing on this page you can press with nothing in
+  // hand. The photo is bundled in `public/` (the same one Universal Images
+  // ships), fetched from this app's own origin and queued exactly as a drop
+  // would be — so the working screen it opens is the real one, not a demo.
+  async function loadExample() {
+    if (loadingExample) return
+    setLoadingExample(true)
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}Example_Image.jpg`)
+      if (!res.ok) throw new Error(`Failed to load the example photo (${res.status})`)
+      const blob = await res.blob()
+      addFiles([new File([blob], 'Example_Image.jpg', { type: blob.type || 'image/jpeg' })])
+    } catch (err) {
+      console.error(err)
+      alert(`Couldn't load the example photo: ${(err as Error).message}`)
+    } finally {
+      setLoadingExample(false)
+    }
+  }
 
   return (
     <div className={`${CONTAINER} flex flex-col gap-4 py-5 lg:py-10`}>
@@ -54,6 +79,16 @@ export default function LandingPage() {
 
           <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900">
             <DropCircle />
+
+            <button
+              type="button"
+              onClick={() => void loadExample()}
+              disabled={loadingExample}
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:border-orange-400 hover:bg-orange-50/40 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:border-orange-500 dark:hover:bg-orange-500/10"
+            >
+              <span aria-hidden="true">🧪</span>
+              {loadingExample ? 'Loading example…' : 'Try with an example photo'}
+            </button>
 
             <div className="mt-5 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
               <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" aria-hidden="true" />

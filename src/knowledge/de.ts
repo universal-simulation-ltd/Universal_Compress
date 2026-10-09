@@ -102,6 +102,7 @@ Bei Video, Bildern und Audio wird alles, was eine Stufe festlegt, unter **Advanc
 - **Animierte GIFs bleiben animiert.** Sie werden gesondert behandelt, und mit Maximum wird jedes zweite Einzelbild entfernt, während die Animation ihre Länge behält.
 - **Video braucht einen geeigneten Browser.** Die Videokomprimierung nutzt den eingebauten Video-Encoder des Browsers, den Chrome, Edge und Safari ab 16.4 mitbringen. PDFs, Bilder und Audio funktionieren in jedem aktuellen Browser.
 - **Manche Videocontainer werden nicht unterstützt.** MP4, M4V und MOV funktionieren. MKV, WebM, AVI, WMV und FLV müssen zuerst in MP4 umgewandelt werden.
+- **Gerade keine Datei zur Hand?** **Try with an example photo** auf dem ersten Bildschirm lädt ein Beispielfoto, das in der App enthalten ist. So sehen Sie, was sie kann, bevor Sie Ihre eigenen Dateien verwenden. Wie alles andere verlässt es Ihr Gerät nie.
 - **Speichern.** Laden Sie die Dateien einzeln herunter oder alle zusammen als ZIP. Dieses ZIP bündelt die Ergebnisse nur; es komprimiert sie nicht weiter.
 - **Beliebig oft ausprobieren.** Ändern Sie die Stufe und komprimieren Sie die ganze Liste erneut, um die Größen zu vergleichen.`,
   },

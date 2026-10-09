@@ -102,6 +102,7 @@ Video, resim ve seste bir düzeyin seçtiği her şey **Advanced** altında gös
 - **Hareketli GIF'ler hareketli kalır.** Bunlar ayrı bir işlemden geçer ve Maximum'da her iki kareden biri atılırken animasyonun süresi korunur.
 - **Video için uygun bir tarayıcı gerekir.** Video sıkıştırma, tarayıcının yerleşik video kodlayıcısını kullanır; bu kodlayıcı Chrome, Edge ve Safari 16.4 ve sonrasında bulunur. PDF'ler, resimler ve ses güncel her tarayıcıda çalışır.
 - **Bazı video kapsayıcıları desteklenmez.** MP4, M4V ve MOV çalışır. MKV, WebM, AVI, WMV ve FLV dosyalarının önce MP4'e dönüştürülmesi gerekir.
+- **Elinizde dosya yok mu?** İlk ekrandaki **Try with an example photo**, uygulamayla birlikte gelen örnek bir fotoğrafı yükler; böylece kendi dosyalarınızı kullanmadan önce ne yaptığını görebilirsiniz. Diğer her şey gibi bu da cihazınızdan hiç çıkmaz.
 - **Kaydetme.** Dosyaları tek tek ya da hepsini birden bir ZIP olarak indirin. Bu ZIP yalnızca sonuçları bir araya getirir; onları daha fazla sıkıştırmaz.
 - **İstediğiniz kadar yeniden deneyin.** Düzeyi değiştirip tüm listeyi yeniden sıkıştırarak boyutları karşılaştırabilirsiniz.`,
   },
