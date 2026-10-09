@@ -10,7 +10,7 @@ import type { FileKind } from './kinds'
  * squeeze?* So that question is asked once, in one vocabulary, and each engine
  * translates it into whatever its own controls happen to be (see `presetFor`).
  *
- * Everything below Advanced is the escape hatch for someone who knows exactly
+ * Everything below Fine-tune is the escape hatch for someone who knows exactly
  * which knob they want. Nobody has to open it.
  */
 export type Level = 'light' | 'balanced' | 'maximum'
@@ -119,7 +119,7 @@ export const DEFAULT_AUDIO_SETTINGS: AudioSettings = {
 
 /**
  * The translation table. Moving the one strength control writes these values
- * into the Advanced fields — it does not hide them, so whatever the level chose
+ * into the Fine-tune fields — it does not hide them, so whatever the level chose
  * is visible and can be overridden straight afterwards.
  */
 export function pdfPreset(level: Level): PdfSettings {

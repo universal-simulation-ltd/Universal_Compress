@@ -24,7 +24,7 @@ first and no tab to find.
 
 And there is one control that matters — **Light / Balanced / Maximum** — asked
 once, in the same words, for every kind of file. Each engine translates that into
-whatever its own knobs happen to be. Everything under *Advanced* is for people
+whatever its own knobs happen to be. Everything under *Fine-tune* is for people
 who already know which knob they want; nobody has to open it.
 
 ## What it compresses

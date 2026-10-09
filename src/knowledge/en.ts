@@ -48,7 +48,7 @@ Two things follow from that:
 
 - A PDF at **Light** is repacked losslessly. Text stays selectable and searchable, and the saving is usually modest.
 - A PDF at **Balanced** or **Maximum** turns each page into a picture. The saving is often large, especially for scans, but the text can no longer be selected or searched.
-- Images, video and audio are re-encoded with lossy formats. The level you choose sets how much detail is traded for size, and the options under Advanced let you set the exact values yourself.`,
+- Images, video and audio are re-encoded with lossy formats. The level you choose sets how much detail is traded for size, and the options under Fine-tune let you set the exact values yourself.`,
   },
   {
     id: 'why-some-files-barely-shrink',
@@ -94,7 +94,7 @@ The strength control asks the same question for every file: how hard should it s
 - **Images.** Light re-encodes at high quality and full size. Balanced limits the longest edge to 2560 pixels. Maximum limits it to 1600 pixels at lower quality.
 - **Audio.** Light is 192 kbps, Balanced 128 kbps, and Maximum 96 kbps mixed down to mono.
 
-For video, images and audio, everything a level chooses is shown under **Advanced**, where you can change any of it.
+For video, images and audio, everything a level chooses is shown under **Fine-tune**, where you can change any of it.
 
 ## A few things worth knowing
 

@@ -48,7 +48,7 @@ Daraus folgt zweierlei:
 
 - Ein PDF wird mit **Light** verlustfrei neu gepackt. Der Text bleibt markierbar und durchsuchbar, die Einsparung ist meist bescheiden.
 - Mit **Balanced** oder **Maximum** wird jede Seite eines PDFs zu einem Bild. Die Einsparung ist oft groß, besonders bei Scans, aber der Text lässt sich danach nicht mehr markieren oder durchsuchen.
-- Bilder, Video und Audio werden in verlustbehaftete Formate neu codiert. Die gewählte Stufe legt fest, wie viel Detail gegen Größe getauscht wird, und unter Advanced können Sie die genauen Werte selbst einstellen.`,
+- Bilder, Video und Audio werden in verlustbehaftete Formate neu codiert. Die gewählte Stufe legt fest, wie viel Detail gegen Größe getauscht wird, und unter Fine-tune können Sie die genauen Werte selbst einstellen.`,
   },
   {
     id: 'why-some-files-barely-shrink',
@@ -94,7 +94,7 @@ Der Stärke-Regler stellt für jede Datei dieselbe Frage: Wie stark soll komprim
 - **Bilder.** Light codiert in hoher Qualität und voller Größe neu. Balanced begrenzt die längste Kante auf 2560 Pixel. Maximum begrenzt sie auf 1600 Pixel bei geringerer Qualität.
 - **Audio.** Light entspricht 192 kbit/s, Balanced 128 kbit/s und Maximum 96 kbit/s in Mono.
 
-Bei Video, Bildern und Audio wird alles, was eine Stufe festlegt, unter **Advanced** angezeigt, wo Sie jeden Wert ändern können.
+Bei Video, Bildern und Audio wird alles, was eine Stufe festlegt, unter **Fine-tune** angezeigt, wo Sie jeden Wert ändern können.
 
 ## Gut zu wissen
 

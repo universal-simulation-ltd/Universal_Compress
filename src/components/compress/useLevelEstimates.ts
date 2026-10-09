@@ -37,7 +37,7 @@ const cache = new Map<string, number | null>()
  * A predicted output size for each of the three levels of one kind.
  *
  * ⚠️ **The selected level is priced from the LIVE settings; the other two from
- * their presets.** That asymmetry is the point. Someone who opens Advanced and
+ * their presets.** That asymmetry is the point. Someone who opens Fine-tune and
  * drags quality to 40% must see the number under the button they are on follow
  * the slider — while the other two keep meaning "what you would get if you
  * pressed this", which is a preset, not the overridden state.

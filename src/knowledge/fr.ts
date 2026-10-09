@@ -48,7 +48,7 @@ Deux conséquences :
 
 - Un PDF en **Light** est réorganisé sans perte. Le texte reste sélectionnable et consultable par recherche, et le gain est généralement modeste.
 - Un PDF en **Balanced** ou **Maximum** transforme chaque page en image. Le gain est souvent important, surtout pour les documents numérisés, mais le texte ne peut plus être sélectionné ni recherché.
-- Les images, la vidéo et l’audio sont réencodés dans des formats avec perte. Le niveau choisi fixe la quantité de détails échangée contre la taille, et les options de la section Advanced vous permettent de régler vous-même les valeurs exactes.`,
+- Les images, la vidéo et l’audio sont réencodés dans des formats avec perte. Le niveau choisi fixe la quantité de détails échangée contre la taille, et les options de la section Fine-tune vous permettent de régler vous-même les valeurs exactes.`,
   },
   {
     id: 'why-some-files-barely-shrink',
@@ -94,7 +94,7 @@ La commande d’intensité pose la même question pour chaque fichier : jusqu’
 - **Images.** Light réencode en haute qualité et en taille réelle. Balanced limite le plus grand côté à 2560 pixels. Maximum le limite à 1600 pixels avec une qualité plus basse.
 - **Audio.** Light correspond à 192 kbit/s, Balanced à 128 kbit/s, et Maximum à 96 kbit/s en mono.
 
-Pour la vidéo, les images et l’audio, tout ce qu’un niveau choisit est affiché dans **Advanced**, où vous pouvez tout modifier.
+Pour la vidéo, les images et l’audio, tout ce qu’un niveau choisit est affiché dans **Fine-tune**, où vous pouvez tout modifier.
 
 ## Bon à savoir
 

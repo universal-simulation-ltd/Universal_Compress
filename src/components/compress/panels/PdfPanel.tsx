@@ -28,7 +28,7 @@ export default function PdfPanel({ count }: { count: string }) {
         {note}
       </Field>
 
-      {/* No Advanced section here, and that is deliberate. A PDF has exactly one
+      {/* No Fine-tune section here, and that is deliberate. A PDF has exactly one
           real decision — keep the text layer or turn the pages into pictures —
           and the three buttons above already are that decision. Exposing render
           DPI and JPEG quality as separate dials would offer two numbers whose

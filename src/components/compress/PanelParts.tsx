@@ -17,7 +17,7 @@ import { createContext, useContext, useId, useState, type ReactNode } from 'reac
  *
  * The summary is what makes closing this honest rather than merely tidy. A
  * disclosure that hides what it is set to is a disclosure that applies settings
- * invisibly — the same rule `Collapsible` below already follows for Advanced.
+ * invisibly — the same rule `Collapsible` below already follows for Fine-tune.
  */
 export function Panel({
   title,

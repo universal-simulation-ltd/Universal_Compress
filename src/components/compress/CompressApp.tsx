@@ -32,10 +32,15 @@ import OptionsColumn, { ActionCard } from './OptionsColumn'
  * than at the top left because "drop more" and "go" are the two things anyone
  * does from this screen twice, and they had ended up at opposite corners.
  *
- * At `lg` and below the two columns stack: tiles, list, settings, circle,
- * button. That order only works because the panels are shut by default — four
- * open ones would put the circle and the button below a screen of controls
- * nobody asked for.
+ * At `lg` and below the two columns stack: tiles, list, settings, button,
+ * circle. That order only works because the panels are shut by default — four
+ * open ones would put the button below a screen of controls nobody asked for.
+ *
+ * ⚠️ On a stacked layout the button comes BEFORE the circle (`max-lg:order-last`
+ * on the circle card; James, 2026-10-10, same fix as Universal Converter's
+ * 444e998). Circle-then-button put "Compress 1 file" at ~990px on a 390×844
+ * phone — off the first screen under a 300px ring. Now it is ~620px with one
+ * file and ~750px with three. Desktop keeps the circle directly above it.
  */
 export default function CompressApp() {
   // The whole queue, not a derived count: a selector returning `items.length`
@@ -74,7 +79,7 @@ export default function CompressApp() {
             they were at opposite ends of the page. */}
         <div className="flex flex-col gap-4">
           <OptionsColumn />
-          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6 dark:border-slate-800 dark:bg-slate-900">
+          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6 max-lg:order-last dark:border-slate-800 dark:bg-slate-900">
             <DropCircle />
           </div>
           <ActionCard />

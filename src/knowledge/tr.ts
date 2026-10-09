@@ -48,7 +48,7 @@ Bundan iki sonuç çıkar:
 
 - **Light** seçeneğinde bir PDF kayıpsız olarak yeniden paketlenir. Metin seçilebilir ve aranabilir kalır; kazanç genellikle mütevazıdır.
 - **Balanced** veya **Maximum** seçeneğinde PDF'nin her sayfası bir resme dönüştürülür. Kazanç özellikle taranmış belgelerde çoğu zaman büyüktür, ancak metin artık seçilemez ve aranamaz.
-- Resimler, video ve ses kayıplı biçimlerde yeniden kodlanır. Seçtiğiniz düzey, boyut karşılığında ne kadar ayrıntıdan vazgeçileceğini belirler; Advanced altındaki seçeneklerle tam değerleri kendiniz ayarlayabilirsiniz.`,
+- Resimler, video ve ses kayıplı biçimlerde yeniden kodlanır. Seçtiğiniz düzey, boyut karşılığında ne kadar ayrıntıdan vazgeçileceğini belirler; Fine-tune altındaki seçeneklerle tam değerleri kendiniz ayarlayabilirsiniz.`,
   },
   {
     id: 'why-some-files-barely-shrink',
@@ -94,7 +94,7 @@ Güç denetimi her dosya için aynı soruyu sorar: Ne kadar sıkıştırılsın?
 - **Resimler.** Light yüksek kalitede ve tam boyutta yeniden kodlar. Balanced en uzun kenarı 2560 pikselle sınırlar. Maximum daha düşük kaliteyle 1600 pikselle sınırlar.
 - **Ses.** Light 192 kbps, Balanced 128 kbps, Maximum ise mono olarak 96 kbps'dir.
 
-Video, resim ve seste bir düzeyin seçtiği her şey **Advanced** altında gösterilir ve oradan istediğiniz değeri değiştirebilirsiniz.
+Video, resim ve seste bir düzeyin seçtiği her şey **Fine-tune** altında gösterilir ve oradan istediğiniz değeri değiştirebilirsiniz.
 
 ## Bilmekte yarar var
 

@@ -121,7 +121,7 @@ export const useCompressStore = create<CompressState>((set, get) => ({
     })
   },
 
-  // Moving the strength control rewrites that kind's Advanced fields. It does
+  // Moving the strength control rewrites that kind's Fine-tune fields. It does
   // not lock them: whatever the level chose stays visible and editable, and
   // editing one simply leaves the level where it is.
   setLevel(kind, level) {

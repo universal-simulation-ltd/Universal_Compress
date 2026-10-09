@@ -84,7 +84,7 @@ export default function VideoPanel({ count }: { count: string }) {
 
       <Divider />
 
-      <Collapsible label="Advanced" summary={advanced.filter(Boolean).join(' · ')}>
+      <Collapsible label="Fine-tune" summary={advanced.filter(Boolean).join(' · ')}>
         <Field label="Resolution">
           <Select
             options={HEIGHTS}

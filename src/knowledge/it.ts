@@ -48,7 +48,7 @@ Ne derivano due cose:
 
 - Un PDF con **Light** viene riorganizzato senza perdita. Il testo resta selezionabile e ricercabile, e il risparmio di solito è modesto.
 - Un PDF con **Balanced** o **Maximum** trasforma ogni pagina in un’immagine. Il risparmio è spesso grande, soprattutto per le scansioni, ma il testo non si può più selezionare né cercare.
-- Immagini, video e audio vengono ricodificati in formati con perdita. Il livello che scegli stabilisce quanto dettaglio scambiare con la dimensione, e le opzioni in Advanced ti permettono di impostare i valori esatti.`,
+- Immagini, video e audio vengono ricodificati in formati con perdita. Il livello che scegli stabilisce quanto dettaglio scambiare con la dimensione, e le opzioni in Fine-tune ti permettono di impostare i valori esatti.`,
   },
   {
     id: 'why-some-files-barely-shrink',
@@ -94,7 +94,7 @@ Il comando di intensità fa la stessa domanda per ogni file: quanto bisogna comp
 - **Immagini.** Light ricodifica ad alta qualità e a dimensione piena. Balanced limita il lato più lungo a 2560 pixel. Maximum lo limita a 1600 pixel con qualità più bassa.
 - **Audio.** Light è 192 kbps, Balanced 128 kbps e Maximum 96 kbps mixato in mono.
 
-Per video, immagini e audio, tutto ciò che un livello sceglie è visibile in **Advanced**, dove puoi modificare qualsiasi valore.
+Per video, immagini e audio, tutto ciò che un livello sceglie è visibile in **Fine-tune**, dove puoi modificare qualsiasi valore.
 
 ## Buono a sapersi
 
