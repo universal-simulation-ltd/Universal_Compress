@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { UniversalProvider } from '@unisim/sdk'
+import { Capacitor } from '@capacitor/core'
 import App from './App'
 import { useCompressStore } from './stores/compressStore'
 import './index.css'
@@ -10,9 +11,8 @@ if (import.meta.env.DEV) {
 }
 
 // Universal Compress never sends a byte of anyone's file anywhere. We still
-// mount <UniversalProvider> so the shared navbar works and, when the visitor is
-// signed in on .unisim.co.uk, the navbar shows their profile/avatar and their
-// suite-wide language choice.
+// mount <UniversalProvider> so the shared navbar works, with the suite-wide
+// language choice.
 //
 // The fallback is the REAL public suite project (publishable anon key — safe to
 // ship; RLS is the security boundary). Env vars override.
@@ -38,12 +38,21 @@ if (import.meta.env.DEV) {
 // `as ProductCode` here: that cast is exactly what let the Converter/USB bug
 // survive to production. If the type ever fights you, it is telling you the enum
 // is missing a value — go and add it.
+// No accounts, and no user count from the phone app (privacy audit
+// 2026-10-12). `noAccounts: true` drops the navbar's profile icon and sign-in,
+// and <UsageTracker /> is gone. `presence` (the SDK user count: a random
+// install id + platform every 45 s) stays on the website only — the iOS and
+// Android builds send nothing, which is what ios/App/App/PrivacyInfo.xcprivacy
+// and store-assets/data-safety.json declare. Change all of them together, and
+// PRIVACY.md + the "files stay on your device" article with them.
 const universalConfig = {
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL || 'https://rygfxgalojojppxmhddo.supabase.co',
   supabaseAnonKey:
     import.meta.env.VITE_SUPABASE_ANON_KEY ||
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Z2Z4Z2Fsb2pvanBweG1oZGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NTY4MjUsImV4cCI6MjA5NDMzMjgyNX0.hLy_vt9vY_rdPKF3nL32yAuMCD604E3CH5VM7D7CaNE',
   product: 'compress' as const,
+  noAccounts: true,
+  presence: !Capacitor.isNativePlatform(),
   cookieDomain: import.meta.env.PROD ? '.unisim.co.uk' : undefined,
 }
 

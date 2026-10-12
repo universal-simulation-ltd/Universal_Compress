@@ -7,7 +7,6 @@ import credits from './generated/credits.json'
 import AppMenu from './components/Header/AppMenu'
 import ProductLogo from './components/Header/ProductLogo'
 import CompressApp from './components/compress/CompressApp'
-import { UsageTracker } from '@unisim/sdk'
 import { CONTAINER } from './lib/layout'
 import { useCompressStore } from './stores/compressStore'
 import { useThemeStore } from './stores/themeStore'
@@ -79,8 +78,6 @@ export default function App() {
       <div className={`${CONTAINER} pt-4 empty:hidden`}>
         <UpdateNotice />
       </div>
-
-      <UsageTracker />
 
       <main className="flex-1">
         <CompressApp />
