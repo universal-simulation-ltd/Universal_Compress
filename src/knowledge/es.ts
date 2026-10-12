@@ -125,10 +125,9 @@ Como no se sube nada, no hay límite de tamaño ni cupo diario. El único límit
 
 La aplicación sí hace algunas peticiones pequeñas que no tienen nada que ver con sus archivos:
 
-- **Una señal de «aplicación en uso»**, solo desde el sitio web: cada 45 segundos mientras la aplicación está abierta y en pantalla, envía el nombre de la aplicación, un identificador aleatorio creado en su dispositivo y el tipo de dispositivo (web, teléfono u ordenador), para que podamos contar cuántas personas usan la aplicación. No dice nada de sus archivos y no está vinculada a usted. La aplicación para teléfono no la envía.
 - **La búsqueda de actualizaciones** y la descarga de la lista de novedades.
 
-No hay inicio de sesión, ni publicidad, ni seguimiento de terceros.
+No hay inicio de sesión, ni recuento de uso, ni publicidad, ni seguimiento de terceros: la aplicación ni siquiera nos avisa de que se ha abierto.
 
 ## Compruébelo usted mismo
 

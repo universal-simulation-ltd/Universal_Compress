@@ -125,10 +125,9 @@ Como nada é enviado, não há limite de tamanho nem cota diária. O único limi
 
 O app faz algumas pequenas solicitações que não têm nada a ver com seus arquivos:
 
-- **Um sinal de "app em uso"**, só pelo site: a cada 45 segundos enquanto o app está aberto e na tela, ele envia o nome do app, um ID aleatório criado no seu dispositivo e o tipo de dispositivo (web, celular ou computador), para contarmos quantas pessoas usam o app. Não diz nada sobre os seus arquivos e não está ligado a você. O app para celular não o envia.
 - **A verificação de atualizações** e a busca da lista de novidades.
 
-Não há login, publicidade nem rastreamento de terceiros.
+Não há login, contagem de uso, publicidade nem rastreamento de terceiros: o app nem sequer nos avisa que foi aberto.
 
 ## Confira você mesmo
 

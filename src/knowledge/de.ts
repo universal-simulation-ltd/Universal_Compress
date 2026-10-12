@@ -125,10 +125,9 @@ Da nichts hochgeladen wird, gibt es weder eine Größengrenze noch ein Tageskont
 
 Die App stellt einige kleine Anfragen, die nichts mit Ihren Dateien zu tun haben:
 
-- **Ein Signal „App in Benutzung“**, nur von der Website: alle 45 Sekunden, solange die App geöffnet und sichtbar ist, sendet sie den Namen der App, eine auf Ihrem Gerät erzeugte Zufalls-ID und die Geräteart (Web, Telefon oder Computer), damit wir zählen können, wie viele Menschen die App nutzen. Es sagt nichts über Ihre Dateien und ist nicht mit Ihnen verknüpft. Die Telefon-App sendet es nicht.
 - **Die Suche nach Updates** und das Abrufen der Liste der Neuerungen.
 
-Es gibt keine Anmeldung, keine Werbung und kein Tracking durch Dritte.
+Es gibt keine Anmeldung, keine Nutzungszählung, keine Werbung und kein Tracking durch Dritte: Die App teilt uns nicht einmal mit, dass sie geöffnet wurde.
 
 ## Prüfen Sie es selbst
 

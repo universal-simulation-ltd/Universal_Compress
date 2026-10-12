@@ -125,10 +125,9 @@ Because nothing is uploaded, there is no file size limit and no daily allowance.
 
 The app does make a few small requests that have nothing to do with your files:
 
-- **A "this app is in use" signal**, from the website only: every 45 seconds while the app is open and on screen, it sends the app's name, a random ID made on your device and the kind of device (web, phone or computer), so we can count how many people use the app. It says nothing about your files and is not linked to you. The phone app does not send it.
 - **Checking for updates** and fetching the list of changes.
 
-There is no sign-in, no advertising and no third-party tracking.
+There is no sign-in, no usage count, no advertising and no third-party tracking: the app does not even tell us that it was opened.
 
 ## Check it yourself
 
