@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { PrivacyNote } from '@unisim/sdk'
+import { phoneAlert, PrivacyNote } from '@unisim/sdk'
 import DropCircle from '../compress/DropCircle'
 import CompressIllustration from './CompressIllustration'
 import { CONTAINER } from '../../lib/layout'
 import { useThemeStore } from '../../stores/themeStore'
 import { useCompressStore } from '../../stores/compressStore'
-import { say } from '../../native/parts'
 
 /**
  * What the app opens on, before anything has been dropped.
@@ -43,7 +42,7 @@ export default function LandingPage() {
       addFiles([new File([blob], 'Example_Image.jpg', { type: blob.type || 'image/jpeg' })])
     } catch (err) {
       console.error(err)
-      say(`Couldn't load the example photo: ${(err as Error).message}`)
+      phoneAlert(`Couldn't load the example photo: ${(err as Error).message}`)
     } finally {
       setLoadingExample(false)
     }
