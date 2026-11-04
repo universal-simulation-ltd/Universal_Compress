@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { phoneAlert, PrivacyNote } from '@unisim/sdk'
+import { phoneAlert, PrivacyNote, buttonClass } from '@unisim/sdk'
 import DropCircle from '../compress/DropCircle'
 import CompressIllustration from './CompressIllustration'
 import { CONTAINER } from '../../lib/layout'
@@ -84,7 +84,7 @@ export default function LandingPage() {
               type="button"
               onClick={() => void loadExample()}
               disabled={loadingExample}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:border-orange-400 hover:bg-orange-50/40 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:border-orange-500 dark:hover:bg-orange-500/10"
+              className={`${buttonClass()} mt-5 w-full disabled:cursor-wait`}
             >
               <span aria-hidden="true">🧪</span>
               {loadingExample ? 'Loading example…' : 'Try with an example photo'}

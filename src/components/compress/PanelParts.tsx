@@ -147,7 +147,8 @@ export function Segmented<T extends string | number>({
   onChange: (value: T) => void
 }) {
   return (
-    <div className="flex overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
+    // The suite's tray tabs (SDK 0.216, BRANDING.md → Tabs); aria-pressed selects.
+    <div className="u-tabs flex w-full">
       {options.map((o) => (
         <button
           key={String(o.value)}
@@ -155,9 +156,7 @@ export function Segmented<T extends string | number>({
           disabled={disabled}
           aria-pressed={value === o.value}
           onClick={() => onChange(o.value)}
-          className={`flex-1 py-1.5 text-[11.5px] font-semibold transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-orange-600 disabled:opacity-50 ${
-            value === o.value ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
-          }`}
+          className="u-tab flex-1 justify-center px-2 py-1.5 text-[11.5px] disabled:opacity-50"
         >
           {o.label}
         </button>
@@ -192,7 +191,8 @@ export function LevelPicker<T extends string>({
   sub?: (value: T) => string | null
 }) {
   return (
-    <div className="grid grid-cols-3 gap-1.5">
+    // Tray tabs as well (SDK 0.216), with the size line under each label.
+    <div className="u-tabs grid w-full grid-cols-3">
       {options.map((o) => {
         const active = value === o.value
         const line = sub?.(o.value) ?? null
@@ -203,18 +203,12 @@ export function LevelPicker<T extends string>({
             disabled={disabled}
             aria-pressed={active}
             onClick={() => onChange(o.value)}
-            className={`rounded-lg px-2 py-2 text-[12px] font-bold transition-colors focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-50 ${
-              active
-                ? 'bg-gradient-to-br from-[#FE8C01] to-[#E05504] text-white shadow-sm'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700/60'
-            }`}
+            className="u-tab flex-col justify-center gap-0.5 px-2 py-2 text-[12px] disabled:opacity-50"
           >
             <span className="block">{o.label}</span>
             {sub && (
               <span
-                className={`mt-0.5 block text-[10px] font-semibold tabular-nums ${
-                  active ? 'text-white/85' : 'text-slate-500 dark:text-slate-400'
-                }`}
+                className="block text-[10px] font-semibold tabular-nums text-slate-500 dark:text-slate-400"
               >
                 {/* A non-breaking space, not an empty string: the line has to
                     occupy its height before the first estimate lands, or every

@@ -1,10 +1,15 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { UniversalProvider } from '@unisim/sdk'
+import { UniversalProvider, installButtonStyles, installTabStyles } from '@unisim/sdk'
 import { Capacitor } from '@capacitor/core'
 import App from './App'
 import { useCompressStore } from './stores/compressStore'
 import './index.css'
+
+// The suite's key buttons and tray tabs, used as class strings (SDK 0.216,
+// BRANDING.md → Buttons, Tabs).
+installButtonStyles()
+installTabStyles()
 
 if (import.meta.env.DEV) {
   ;(window as unknown as { __stores: unknown }).__stores = { compress: useCompressStore }

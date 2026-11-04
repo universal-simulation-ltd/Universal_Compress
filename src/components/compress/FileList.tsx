@@ -1,4 +1,4 @@
-import { ValueChip } from '@unisim/sdk'
+import { ValueChip, buttonClass } from '@unisim/sdk'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { totals, useCompressStore, type Item } from '../../stores/compressStore'
 import type { DetectedKind } from '../../lib/kinds'
@@ -107,7 +107,7 @@ function FileRow({ item }: { item: Item }) {
           type="button"
           onClick={() => downloadItem(item.id)}
           aria-label={`Download ${item.result.name}`}
-          className="shrink-0 rounded-lg bg-orange-500/12 px-2.5 py-1.5 text-[11.5px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 dark:bg-orange-500/15 dark:text-orange-300 dark:hover:bg-orange-500/25"
+          className={`${buttonClass('soft', 'sm')} shrink-0`}
         >
           Download
         </button>

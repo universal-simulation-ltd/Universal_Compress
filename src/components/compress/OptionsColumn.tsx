@@ -1,4 +1,4 @@
-import { ValueChip } from '@unisim/sdk'
+import { ValueChip, buttonClass } from '@unisim/sdk'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { kindLabel } from '../../lib/kinds'
 import { useCompressStore, kindsPresent, totals } from '../../stores/compressStore'
@@ -150,10 +150,9 @@ export function ActionCard() {
   const downloadLabel =
     t.done === 1 ? 'Download the compressed file' : `Download all ${t.done} files as a ZIP`
 
-  const primary =
-    'w-full rounded-xl bg-gradient-to-br from-[#FE8C01] to-[#E05504] px-4 py-3 text-[14px] font-bold text-white shadow-sm transition-opacity hover:opacity-95 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:cursor-not-allowed disabled:opacity-40'
-  const secondary =
-    'w-full rounded-xl bg-orange-500/12 px-4 py-2.5 text-[13px] font-bold text-orange-800 transition-colors hover:bg-orange-500/20 dark:bg-orange-500/15 dark:text-orange-300 dark:hover:bg-orange-500/25 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600 disabled:cursor-not-allowed disabled:opacity-40'
+  // The suite's key buttons (SDK 0.216, BRANDING.md → Buttons).
+  const primary = `${buttonClass('primary')} w-full`
+  const secondary = `${buttonClass('soft')} w-full`
 
   return (
     <div
