@@ -127,7 +127,7 @@ The app does make a few small requests that have nothing to do with your files:
 
 - **Checking for updates** and fetching the list of changes.
 
-There is no sign-in, no usage count, no advertising and no third-party tracking: the app does not even tell us that it was opened.
+There is no account of its own, no usage count, no advertising and no third-party tracking: the app does not even tell us that it was opened. If you are already signed in to a UNI·SIM app, it recognises you so your suite-wide settings, such as colour scheme and language, come with you, and Tune this app offers a discreet Sign in. Your files are never tied to it.
 
 ## Check it yourself
 

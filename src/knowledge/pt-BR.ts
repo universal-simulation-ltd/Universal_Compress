@@ -127,7 +127,7 @@ O app faz algumas pequenas solicitações que não têm nada a ver com seus arqu
 
 - **A verificação de atualizações** e a busca da lista de novidades.
 
-Não há login, contagem de uso, publicidade nem rastreamento de terceiros: o app nem sequer nos avisa que foi aberto.
+Não há conta própria, contagem de uso, publicidade nem rastreamento de terceiros: o app nem sequer nos avisa que foi aberto. Se você já fez login em um app da UNI·SIM, o app reconhece isso para que suas configurações de toda a suíte, como esquema de cores e idioma, venham junto, e Ajustar este app oferece um login discreto. Seus arquivos nunca ficam ligados a ele.
 
 ## Confira você mesmo
 

@@ -127,7 +127,7 @@ Die App stellt einige kleine Anfragen, die nichts mit Ihren Dateien zu tun haben
 
 - **Die Suche nach Updates** und das Abrufen der Liste der Neuerungen.
 
-Es gibt keine Anmeldung, keine Nutzungszählung, keine Werbung und kein Tracking durch Dritte: Die App teilt uns nicht einmal mit, dass sie geöffnet wurde.
+Es gibt kein eigenes Konto, keine Nutzungszählung, keine Werbung und kein Tracking durch Dritte: Die App teilt uns nicht einmal mit, dass sie geöffnet wurde. Sind Sie bereits bei einer UNI·SIM-App angemeldet, erkennt die App das, damit Ihre suiteweiten Einstellungen wie Farbschema und Sprache mitkommen, und „Diese App anpassen“ bietet eine dezente Anmeldung an. Ihre Dateien werden nie damit verknüpft.
 
 ## Prüfen Sie es selbst
 

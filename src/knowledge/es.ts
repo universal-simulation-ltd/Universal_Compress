@@ -127,7 +127,7 @@ La aplicación sí hace algunas peticiones pequeñas que no tienen nada que ver 
 
 - **La búsqueda de actualizaciones** y la descarga de la lista de novedades.
 
-No hay inicio de sesión, ni recuento de uso, ni publicidad, ni seguimiento de terceros: la aplicación ni siquiera nos avisa de que se ha abierto.
+No hay una cuenta propia, ni recuento de uso, ni publicidad, ni seguimiento de terceros: la aplicación ni siquiera nos avisa de que se ha abierto. Si ya ha iniciado sesión en una app de UNI·SIM, la aplicación lo reconoce para que sus ajustes comunes a todo el conjunto, como el esquema de colores y el idioma, le acompañen, y Ajustar esta app ofrece un discreto inicio de sesión. Sus archivos nunca se vinculan a él.
 
 ## Compruébelo usted mismo
 

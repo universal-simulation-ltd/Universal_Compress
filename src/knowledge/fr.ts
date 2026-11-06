@@ -127,7 +127,7 @@ L’application effectue quelques petites requêtes sans aucun rapport avec vos 
 
 - **La recherche de mises à jour** et la récupération de la liste des nouveautés.
 
-Il n’y a ni connexion, ni comptage d’utilisation, ni publicité, ni suivi par des tiers : l’application ne nous signale même pas qu’elle a été ouverte.
+Il n’y a ni compte propre, ni comptage d’utilisation, ni publicité, ni suivi par des tiers : l’application ne nous signale même pas qu’elle a été ouverte. Si vous êtes déjà connecté à une application UNI·SIM, elle vous reconnaît pour que vos réglages communs à toute la suite, comme le thème de couleurs et la langue, vous suivent, et Régler cette application propose une connexion discrète. Vos fichiers n’y sont jamais rattachés.
 
 ## Vérifiez par vous-même
 
