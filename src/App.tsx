@@ -34,6 +34,9 @@ export default function App() {
     // a page or a bottom sheet (`src/native/`).
     <div className={`flex min-h-screen flex-col bg-slate-100 dark:bg-slate-950 ${PHONE ? '' : 'pt-[env(safe-area-inset-top)]'}`}>
       {PHONE ? <CompressPhoneBar /> : <UniversalAppsNavBar
+        // Signed in, the bar says whose it is: "Bradley’s Compressor" ("James’ Compressor",
+        // "My Compressor" with no name), and Tune this app gets the account area (James, 2026-11-10 rollout).
+        personalTitle={(name) => (name ? `${/s$/i.test(name.trim()) ? `${name}’` : `${name}’s`} Compressor` : 'My Compressor')}
         product="compress"
         theme={theme}
         productLogo={<ProductLogo />}
