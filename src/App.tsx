@@ -37,6 +37,11 @@ export default function App() {
         // Signed in, the bar says whose it is: "Bradley’s Compressor" ("James’ Compressor",
         // "My Compressor" with no name), and Tune this app gets the account area (James, 2026-11-10 rollout).
         personalTitle={(name) => (name ? `${/s$/i.test(name.trim()) ? `${name}’` : `${name}’s`} Compressor` : 'My Compressor')}
+        // The account box is Tune this app ▸ Your Universal ID (Call me, App name — "Your …" or the
+        // product's own name — email, the hub, Sign out), as BlackBook and PDF; no greeting in the bar
+        // (James, 2026-10-30: "make this style the global rule"). Under `noAccounts` (main.tsx) nothing
+        // changes on screen until Tune's discreet Sign in brings a session; it matches the rest of the suite.
+        accountInTune
         product="compress"
         theme={theme}
         productLogo={<ProductLogo />}
