@@ -57,11 +57,13 @@ export default function OptionsColumn() {
  */
 function NothingUsableCard() {
   return (
-    <div className="rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-      <div className="border-b border-slate-200 px-4 py-3 dark:border-slate-800">
+    // An empty state: nothing in frame (BRANDING.md → Boxes, D · empty), all
+    // four corners muted and no outline.
+    <div className="u-box u-box--frame u-box--empty rounded-lg p-0 text-left">
+      <div className="px-4 pt-4">
         <span className="text-[12.5px] font-bold text-slate-900 dark:text-slate-100">Nothing here can be compressed</span>
       </div>
-      <div className="flex flex-col gap-3 p-4">
+      <div className="flex flex-col gap-3 px-4 pb-4 pt-2">
         <p className="text-[11.5px] leading-relaxed text-slate-500 dark:text-slate-400">
           Every file in the list is one this app can’t open — the reason is on each row. Drop
           something below and its settings will appear here.
@@ -194,19 +196,20 @@ export function ActionCard() {
             that saved are the supporting line under it, because they only mean
             anything relative to it. */}
         {t.done > 0 && (
-          <div className="rounded-lg bg-white/70 px-3 py-2.5 ring-1 ring-orange-200/70 dark:bg-slate-900/70 dark:ring-orange-900/60">
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[10.5px] font-bold uppercase tracking-[0.09em] text-slate-500 dark:text-slate-400">
-                {allDone ? 'New size' : 'So far'}
+          // The result: a record carrying a value, so the suite's Key box
+          // (BRANDING.md → Boxes, C), its tab saying what the figure is. The
+          // tab stays neutral; the saving's own chip carries the green.
+          <div className="u-box u-box--key mt-2 bg-white/70 px-3 pb-2.5 pt-5 dark:bg-slate-900/70">
+            <span className="u-box__key">{allDone ? 'New size' : 'So far'}</span>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[26px] font-bold leading-none tabular-nums text-slate-900 dark:text-slate-100">
+                {formatBytes(t.bytesOutDone)}
               </span>
               {saved >= 1 && (
                 <ValueChip size="sm" tone="good">
                   −{saved}%
                 </ValueChip>
               )}
-            </div>
-            <div className="mt-1 text-[26px] font-bold leading-none tabular-nums text-slate-900 dark:text-slate-100">
-              {formatBytes(t.bytesOutDone)}
             </div>
             <div className="mt-1.5 text-[11px] leading-snug text-slate-500 dark:text-slate-400">
               {saved >= 1 ? (

@@ -79,7 +79,9 @@ export default function CompressApp() {
             they were at opposite ends of the page. */}
         <div className="flex flex-col gap-4">
           <OptionsColumn />
-          <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-white px-4 py-6 max-lg:order-last dark:border-slate-800 dark:bg-slate-900">
+          {/* Where more files come in: a Viewfinder box (BRANDING.md → Boxes,
+              D), its leading corner lit because something is in frame now. */}
+          <div className="u-box u-box--frame flex flex-col items-center rounded-lg bg-white px-4 py-6 max-lg:order-last dark:bg-slate-900">
             <DropCircle />
           </div>
           <ActionCard />

@@ -77,7 +77,11 @@ export default function LandingPage() {
             Make PDFs, videos, photos and audio smaller, right here on your device. Drop one or many.
           </p>
 
-          <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+          {/* The front door is where files come in, with nothing in frame yet:
+              the suite's Viewfinder box, empty (BRANDING.md → Boxes, D), all
+              four corners muted and no outline. It keeps its white fill, which
+              the drop circle is drawn for. */}
+          <div className="u-box u-box--frame u-box--empty mt-7 rounded-lg bg-white p-5 text-left sm:p-6 dark:bg-slate-900">
             <DropCircle />
 
             <button
