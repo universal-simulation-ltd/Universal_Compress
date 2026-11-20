@@ -1,4 +1,9 @@
-import { ValueChip, buttonClass } from '@unisim/sdk'
+import type { TouchEvent } from 'react'
+import { Button, SelectCheckbox, SelectionBar, SwipeGroup, SwipeRow, ValueChip, buttonClass } from '@unisim/sdk'
+import { removeSwipe, selectSwipe, useListSelect } from '../../native/listGestures'
+import { PHONE } from '../../native/shell'
+import { useNT } from '../../native/strings'
+import { offerUndo } from '../../native/undo'
 import { formatBytes, savingPercent } from '../../lib/layout'
 import { totals, useCompressStore, type Item } from '../../stores/compressStore'
 import type { DetectedKind } from '../../lib/kinds'
@@ -6,15 +11,81 @@ import type { DetectedKind } from '../../lib/kinds'
 /** The queue, under the circle. One row per dropped file, whatever became of it. */
 export default function FileList() {
   const items = useCompressStore((s) => s.items)
+  const running = useCompressStore((s) => s.running)
+  const t = useNT()
+  // The phone app's list gestures (BRANDING.md ▸ "A deletable row swipes"):
+  // swipe a file left to take it off the list (with Undo), right to select
+  // it; hold to select. Selection mode waits for a batch to finish.
+  const pick = useListSelect(items.map((i) => i.id), PHONE && !running)
   if (items.length === 0) return null
 
+  const swipeOff = (item: Item) => {
+    const { takeItem, restoreItem } = useCompressStore.getState()
+    const taken = takeItem(item.id)
+    if (taken) offerUndo({ name: item.file.name, restore: () => restoreItem(taken) })
+  }
+
   return (
-    <ul className="divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
-      {items.map((item) => (
-        <FileRow key={item.id} item={item} />
-      ))}
-    </ul>
+    <div className="flex flex-col gap-2">
+      {pick.selecting && (
+        // The suite's select-several bar: Remove selected (the files leave the
+        // list, nothing is deleted), Clear, and Done to leave.
+        <SelectionBar
+          sel={pick.sel}
+          action="remove"
+          noun={{ one: t('app.noun_one'), other: t('app.noun_other') }}
+          onDelete={(ids) => {
+            const { removeItem } = useCompressStore.getState()
+            for (const id of ids) removeItem(id)
+            pick.leave()
+          }}
+          extra={
+            <Button size="sm" onClick={pick.leave} data-select-done>
+              {t('app.select_done')}
+            </Button>
+          }
+          className="flex-wrap"
+        />
+      )}
+      <SwipeGroup>
+        <ul className="divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 bg-white dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900">
+          {items.map((item) => (
+            <FileRow
+              key={item.id}
+              item={item}
+              phone={
+                PHONE
+                  ? {
+                      t,
+                      selecting: pick.selecting,
+                      checked: pick.sel.has(item.id),
+                      canSelect: !running,
+                      onToggle: () => pick.sel.toggle(item.id),
+                      onHold: pick.holdStart(item.id),
+                      onSwipeOff: () => swipeOff(item),
+                      onSelect: () => pick.start(item.id),
+                    }
+                  : null
+              }
+            />
+          ))}
+        </ul>
+      </SwipeGroup>
+    </div>
   )
+}
+
+/** The phone app's swipes, hold and selection mode for one row. */
+interface PhoneRow {
+  t: ReturnType<typeof useNT>
+  selecting: boolean
+  checked: boolean
+  /** Selection mode can start (not while a batch runs). */
+  canSelect: boolean
+  onToggle: () => void
+  onHold: (e: TouchEvent) => void
+  onSwipeOff: () => void
+  onSelect: () => void
 }
 
 /**
@@ -45,17 +116,30 @@ export function StatusAnnouncer() {
   )
 }
 
-function FileRow({ item }: { item: Item }) {
+function FileRow({ item, phone }: { item: Item; phone: PhoneRow | null }) {
   const running = useCompressStore((s) => s.running)
   const removeItem = useCompressStore((s) => s.removeItem)
   const downloadItem = useCompressStore((s) => s.downloadItem)
 
   const unsupported = item.kind === 'unsupported'
   const saved = item.result ? savingPercent(item.file.size, item.result.blob.size) : 0
+  const selecting = phone?.selecting ?? false
+  // As the ✕: anything but the file being compressed right now.
+  const removable = !(running && item.status === 'running')
 
-  return (
-    <li className={`relative flex items-center gap-3 px-3.5 py-3 ${unsupported ? 'bg-slate-50 dark:bg-slate-800/50' : ''}`}>
-      <KindIcon kind={item.kind} />
+  const body = (
+    <div className={`relative flex items-center gap-3 px-3.5 py-3 ${unsupported ? 'bg-slate-50 dark:bg-slate-800/50' : ''}`}>
+      {selecting && phone ? (
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center">
+          <SelectCheckbox
+            checked={phone.checked}
+            onChange={phone.onToggle}
+            label={phone.t('app.swipe_select_named', { name: item.file.name })}
+          />
+        </span>
+      ) : (
+        <KindIcon kind={item.kind} />
+      )}
 
       <div className="min-w-0 flex-1">
         <p className={`truncate text-[12.5px] font-semibold ${unsupported ? 'text-slate-500 dark:text-slate-400' : 'text-slate-900 dark:text-slate-100'}`}>
@@ -102,7 +186,7 @@ function FileRow({ item }: { item: Item }) {
         )}
       </div>
 
-      {item.result && (
+      {item.result && !selecting && (
         <button
           type="button"
           onClick={() => downloadItem(item.id)}
@@ -113,9 +197,9 @@ function FileRow({ item }: { item: Item }) {
         </button>
       )}
 
-      <button
+      {!selecting && <button
         type="button"
-        disabled={running && item.status === 'running'}
+        disabled={!removable}
         onClick={() => removeItem(item.id)}
         aria-label={`Remove ${item.file.name}`}
         className="shrink-0 rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 focus:outline-none focus-visible:outline-2 focus-visible:outline-orange-600 disabled:opacity-30"
@@ -123,7 +207,31 @@ function FileRow({ item }: { item: Item }) {
         <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
           <path d="M4 4l8 8M12 4l-8 8" />
         </svg>
-      </button>
+      </button>}
+    </div>
+  )
+
+  if (!phone) return <li>{body}</li>
+
+  return (
+    <li
+      // A hold selects: no system menu under the finger.
+      style={{ WebkitTouchCallout: 'none' }}
+      onTouchStart={selecting || !phone.canSelect ? undefined : phone.onHold}
+      // In selection mode a tap anywhere on the row ticks it.
+      onClick={selecting ? (e) => { if (!(e.target as Element).closest('input,button')) phone.onToggle() } : undefined}
+      data-file-row={item.id}
+    >
+      <SwipeRow
+        id={item.id}
+        left={phone.canSelect ? selectSwipe(phone.t, item.file.name, phone.onSelect) : undefined}
+        right={removeSwipe(phone.t, item.file.name, phone.onSwipeOff)}
+        disabled={selecting || !removable}
+        actionWidth={88}
+        frontClassName="bg-white dark:bg-slate-900"
+      >
+        {body}
+      </SwipeRow>
     </li>
   )
 }

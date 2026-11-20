@@ -49,6 +49,12 @@ export interface Item {
   keptOriginal?: boolean
 }
 
+/** A file taken off the list by `takeItem`, and where it was. */
+export interface TakenItem {
+  item: Item
+  index: number
+}
+
 interface CompressState {
   items: Item[]
   running: boolean
@@ -60,6 +66,10 @@ interface CompressState {
 
   addFiles(files: File[]): void
   removeItem(id: string): void
+  /** Take a file off the list so it can be put back: the phone's swipe, which offers Undo. */
+  takeItem(id: string): TakenItem | null
+  /** Put a file from `takeItem` back where it was. */
+  restoreItem(taken: TakenItem): void
   clearQueue(): void
   resetSettings(): void
 
@@ -106,6 +116,22 @@ export const useCompressStore = create<CompressState>((set, get) => ({
 
   removeItem(id) {
     set((s) => ({ items: s.items.filter((i) => i.id !== id) }))
+  },
+
+  takeItem(id) {
+    const items = get().items
+    const index = items.findIndex((i) => i.id === id)
+    if (index < 0) return null
+    set({ items: items.filter((i) => i.id !== id) })
+    return { item: items[index]!, index }
+  },
+
+  restoreItem({ item, index }) {
+    const items = get().items
+    if (items.some((i) => i.id === item.id)) return
+    const next = [...items]
+    next.splice(Math.min(index, next.length), 0, item)
+    set({ items: next })
   },
 
   clearQueue() {
