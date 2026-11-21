@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { UniversalProvider, installBoxStyles, installButtonStyles, installTabStyles } from '@unisim/sdk'
 import { Capacitor } from '@capacitor/core'
 import App from './App'
+import { PHONE } from './native/shell'
 import { useCompressStore } from './stores/compressStore'
 import './index.css'
 
@@ -50,7 +51,7 @@ if (import.meta.env.DEV) {
 // 2026-10-12). `noAccounts: true` drops the navbar's profile icon and account
 // rows, and <UsageTracker /> is gone. Since SDK 0.211.0 it no longer keeps
 // people signed out: a suite session the browser already holds is read and
-// followed (their Global Tuning comes with them), and Tune this app offers a
+// followed (their Global Tuning comes with them), and on the website Tune this app offers a
 // discreet Sign in. The SDK user count was retired in 0.187.0;
 // its anonymous daily open count is already off under `noAccounts`, and
 // `openCount` keeps it off in the iOS and Android builds whatever happens to
@@ -64,6 +65,11 @@ const universalConfig = {
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5Z2Z4Z2Fsb2pvanBweG1oZGRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NTY4MjUsImV4cCI6MjA5NDMzMjgyNX0.hLy_vt9vY_rdPKF3nL32yAuMCD604E3CH5VM7D7CaNE',
   product: 'compress' as const,
   noAccounts: true,
+  // The phone builds recognise a suite session silently and show NOTHING about
+  // accounts (James, 2026-11-21): no Sign in, no Your Universal ID, so App
+  // Review has no account to expect a Delete my account for. The website keeps
+  // Tune's discreet Sign in. `PHONE` is the native shell (src/native/shell.ts).
+  signInInTune: !PHONE,
   openCount: !Capacitor.isNativePlatform(),
   cookieDomain: import.meta.env.PROD ? '.unisim.co.uk' : undefined,
 }
